@@ -446,7 +446,7 @@ You can try checking this address directly on:
         <div className="p-4 border-b border-purple-900/30 flex justify-between items-center bg-[#1a1a3a]/50">
           <div className="flex items-center gap-2">
             <Search className="h-5 w-5 text-purple-400" />
-            <h2 className="text-lg font-light">Why Did It Send?</h2>
+            <h2 className="text-lg font-light text-white">Why Did It Send?</h2>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full hover:bg-purple-900/20">
             <X className="h-4 w-4" />
@@ -510,7 +510,9 @@ You can try checking this address directly on:
                           </div>
                         </div>
                         <div className="flex-1">
-                          <div className="font-bold text-lg">{message.tokenData.name || "Unknown Token"}</div>
+                          <div className="font-bold text-lg text-white">
+                            {message.tokenData.name || "Unknown Token"}
+                          </div>
                           <div className="text-sm text-purple-300 flex items-center gap-2 flex-wrap">
                             <span className="bg-purple-800/50 px-2 py-0.5 rounded-full">
                               {message.tokenData.symbol || "???"}
@@ -548,7 +550,7 @@ You can try checking this address directly on:
                             <div className="text-xs text-purple-300 flex items-center gap-1">
                               <BarChart3 className="h-3 w-3" /> Market Cap
                             </div>
-                            <div className="font-medium">${formatNumber(message.tokenData.marketCap)}</div>
+                            <div className="font-medium text-white">${formatNumber(message.tokenData.marketCap)}</div>
                           </div>
                         )}
                       </div>
@@ -647,7 +649,7 @@ You can try checking this address directly on:
                           <Wallet className="h-6 w-6 text-blue-300" />
                         </div>
                         <div className="flex-1">
-                          <div className="font-bold text-lg">Solana Wallet</div>
+                          <div className="font-bold text-lg text-white">Solana Wallet</div>
                           <div className="text-sm text-blue-300">{formatAddress(message.walletData.address)}</div>
                         </div>
                       </div>
@@ -661,7 +663,7 @@ You can try checking this address directly on:
                               <div className="text-xs text-blue-300 flex items-center gap-1">
                                 <TrendingUp className="h-3 w-3" /> Win Rate
                               </div>
-                              <div className="font-medium text-lg">{message.walletData.winRate}</div>
+                              <div className="font-medium text-lg text-white">{message.walletData.winRate}</div>
                             </div>
                           )}
                           {message.walletData.roi && message.walletData.roi !== "Unknown" && (
@@ -669,7 +671,7 @@ You can try checking this address directly on:
                               <div className="text-xs text-blue-300 flex items-center gap-1">
                                 <BarChart3 className="h-3 w-3" /> ROI
                               </div>
-                              <div className="font-medium text-lg">{message.walletData.roi}</div>
+                              <div className="font-medium text-lg text-white">{message.walletData.roi}</div>
                             </div>
                           )}
                         </div>
@@ -696,7 +698,7 @@ You can try checking this address directly on:
                                       {coin.symbol.substring(0, 1)}
                                     </div>
                                     <div>
-                                      <div className="font-medium">{coin.symbol}</div>
+                                      <div className="font-medium text-white">{coin.symbol}</div>
                                       {coin.time && <div className="text-xs text-blue-300/70">{coin.time}</div>}
                                     </div>
                                   </div>
@@ -752,7 +754,7 @@ You can try checking this address directly on:
                     </div>
                   )}
 
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap text-white">{message.content}</p>
 
                   {/* Show error details for debugging if available */}
                   {message.isError && errorDetails && (
@@ -773,7 +775,7 @@ You can try checking this address directly on:
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                   <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
-                  <p className="text-sm">Analyzing contract...</p>
+                  <p className="text-sm text-white">Analyzing contract...</p>
                 </div>
               </div>
             </div>
@@ -790,7 +792,7 @@ You can try checking this address directly on:
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Paste a Solana address (e.g., 5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp...)"
-              className="bg-[#0a0a18] border-purple-900/30 focus-visible:ring-purple-500"
+              className="bg-[#0a0a18] border-purple-900/30 focus-visible:ring-purple-500 text-white"
               disabled={isLoading}
             />
             <Button
@@ -801,7 +803,7 @@ You can try checking this address directly on:
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
-          <p className="text-xs text-zinc-500 mt-2">
+          <p className="text-xs text-zinc-500 mt-2 text-gray-200">
             Paste any Solana contract address or SPL token to analyze why it might have been sent to you.
           </p>
         </div>

@@ -11,12 +11,24 @@ import ChatBot from "@/components/chat-bot"
 import ContractAnalyzerBot from "@/components/contract-analyzer-bot"
 import DirectContractAnalyzer from "@/components/direct-contract-analyzer"
 import DirectChatBot from "@/components/direct-chat-bot"
+import TrendingCoinsConveyor from "@/components/trending-coins-conveyor"
 import { Button } from "@/components/ui/button"
-import { Twitter, Github, Menu, X } from "lucide-react"
+import { Twitter, Github, Menu, X, RefreshCw } from "lucide-react"
 import AnimatedTitle from "@/components/animated-title"
 
 // Dynamically import the 3D background to avoid SSR issues
 const BackgroundScene = dynamic(() => import("@/components/background-scene"), { ssr: false })
+
+interface TrendingCoin {
+  name: string
+  symbol: string
+  image: string | null
+  rugcheck_status: string
+  token_address: string
+  trending_rank: number
+  price: number
+  change_24h: number
+}
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -27,6 +39,10 @@ export default function Home() {
   const [prefilledContractAddress, setPrefilledContractAddress] = useState<string>("")
   const [prefilledWalletAddress, setPrefilledWalletAddress] = useState<string | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [trendingCoins, setTrendingCoins] = useState<TrendingCoin[]>([])
+  const [isLoadingTrending, setIsLoadingTrending] = useState(true)
+  const [trendingError, setTrendingError] = useState<string | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const setIsContractAnalyzerOpen = useState(false)[1]
 
@@ -59,6 +75,38 @@ export default function Home() {
     }
   }, [])
 
+  const fetchTrendingCoins = async () => {
+    try {
+      setIsLoadingTrending(true)
+      setTrendingError(null)
+      setIsRefreshing(true)
+
+      const response = await fetch("/api/trending-coins")
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      setTrendingCoins(data)
+    } catch (error) {
+      console.error("Error fetching trending coins:", error)
+      setTrendingError(error instanceof Error ? error.message : "Failed to fetch trending coins")
+    } finally {
+      setIsLoadingTrending(false)
+      setIsRefreshing(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchTrendingCoins()
+  }, [])
+
   const openChat = () => {
     setIsDirectChatOpen(true)
     setIsAnalyzerOpen(false)
@@ -87,6 +135,11 @@ export default function Home() {
   const closeDirectAnalyzer = () => {
     setIsDirectAnalyzerOpen(false)
     setPrefilledContractAddress("")
+  }
+
+  const handleAnalyzeToken = (address: string) => {
+    setPrefilledContractAddress(address)
+    setIsDirectAnalyzerOpen(true)
   }
 
   return (
@@ -195,7 +248,7 @@ export default function Home() {
           </header>
 
           {/* Main content - centered */}
-          <main className="container mx-auto px-4 flex-1 flex flex-col justify-center items-center">
+          <main className="container mx-auto px-4 flex-1 flex flex-col justify-center items-center overflow-y-auto">
             <div className="flex flex-col items-center justify-center text-center relative max-w-4xl">
               {/* Main Title */}
               <div className="mb-6">
@@ -245,48 +298,81 @@ export default function Home() {
                   </Button>
                 </Link>
               </div>
-
-              {/* Powered by section */}
-              <div className="w-full">
-                <h3 className="text-base font-light text-gray-400 mb-4 text-center">Powered by</h3>
-                <div className="flex flex-wrap justify-center items-center gap-8">
-                  {/* Solana Logo */}
-                  <div className="relative h-8 w-24">
-                    <Image
-                      src="/solana-logo.png"
-                      alt="Solana"
-                      fill
-                      style={{ objectFit: "contain" }}
-                      className="opacity-70 hover:opacity-100 transition-opacity"
-                    />
-                  </div>
-
-                  {/* DexScreener Logo */}
-                  <div className="relative h-8 w-24">
-                    <Image
-                      src="/dexscreener-logo.png"
-                      alt="DexScreener"
-                      fill
-                      style={{ objectFit: "contain" }}
-                      className="opacity-70 hover:opacity-100 transition-opacity"
-                    />
-                  </div>
-
-                  {/* Jupiter Logo */}
-                  <div className="relative h-8 w-24">
-                    <Image
-                      src="/jupiter-logo.png"
-                      alt="Jupiter"
-                      fill
-                      style={{ objectFit: "contain" }}
-                      className="opacity-70 hover:opacity-100 transition-opacity"
-                      priority
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
           </main>
+
+          {/* Trending Coins Conveyor Belt - Fixed at bottom */}
+          <div className="w-full bg-black/50 backdrop-blur-md border-t border-white/10 py-2">
+            <div className="flex justify-between items-center mb-2 px-4">
+              <h3 className="text-sm font-light text-white">Top 20 Trending Coins</h3>
+              <Button
+                onClick={fetchTrendingCoins}
+                disabled={isRefreshing}
+                variant="ghost"
+                size="sm"
+                className="text-purple-400 hover:text-purple-300"
+              >
+                <RefreshCw size={14} className={`mr-1 ${isRefreshing ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+            </div>
+
+            {isLoadingTrending ? (
+              <div className="flex justify-center items-center py-2">
+                <div className="text-zinc-400 text-sm">Loading trending coins...</div>
+              </div>
+            ) : trendingError ? (
+              <div className="flex justify-center items-center py-2">
+                <div className="text-red-400 text-sm">Error: {trendingError}</div>
+              </div>
+            ) : trendingCoins.length === 0 ? (
+              <div className="flex justify-center items-center py-2">
+                <div className="text-zinc-400 text-sm">No trending coins available</div>
+              </div>
+            ) : (
+              <TrendingCoinsConveyor coins={trendingCoins} onCoinClick={handleAnalyzeToken} speed="very-fast" />
+            )}
+          </div>
+
+          {/* Powered by section - moved above conveyor */}
+          <div className="w-full py-4 px-4">
+            <h3 className="text-base font-light text-gray-400 mb-4 text-center">Powered by</h3>
+            <div className="flex flex-wrap justify-center items-center gap-8">
+              {/* Solana Logo */}
+              <div className="relative h-8 w-24">
+                <Image
+                  src="/solana-logo.png"
+                  alt="Solana"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  className="opacity-70 hover:opacity-100 transition-opacity"
+                />
+              </div>
+
+              {/* DexScreener Logo */}
+              <div className="relative h-8 w-24">
+                <Image
+                  src="/dexscreener-logo.png"
+                  alt="DexScreener"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  className="opacity-70 hover:opacity-100 transition-opacity"
+                />
+              </div>
+
+              {/* Jupiter Logo */}
+              <div className="relative h-8 w-24">
+                <Image
+                  src="/jupiter-logo.png"
+                  alt="Jupiter"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  className="opacity-70 hover:opacity-100 transition-opacity"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

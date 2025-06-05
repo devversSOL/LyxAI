@@ -852,26 +852,26 @@ export async function analyzeSolanaToken(address: string, tokenData: TokenData |
     // If we have token data, we can provide a factual analysis
     if (tokenData) {
       // Format the token data into a readable analysis focusing on the requested information
-      let analysis = `## ${tokenData.name || "Unknown Token"} (${tokenData.symbol || "???"})
+      let analysis = `${tokenData.name || "Unknown Token"} (${tokenData.symbol || "???"})
 
-**Basic Information:**
-- **Name:** ${tokenData.name || "Unknown"}
-- **Symbol:** ${tokenData.symbol || "Unknown"}
-- **Market Cap:** ${tokenData.marketCap ? "$" + formatNumber(tokenData.marketCap) : "Unknown"}
-${tokenData.createdAt ? `- **Created:** ${new Date(tokenData.createdAt).toLocaleDateString()}` : ""}
+Basic Information:
+- Name: ${tokenData.name || "Unknown"}
+- Symbol: ${tokenData.symbol || "Unknown"}
+- Market Cap: ${tokenData.marketCap ? "$" + formatNumber(tokenData.marketCap) : "Unknown"}
+${tokenData.createdAt ? `- Created: ${new Date(tokenData.createdAt).toLocaleDateString()}` : ""}
 
-**Links:**`
+Links:`
 
       // Add website and Twitter information if available
       if (tokenData.socials) {
         if (tokenData.socials.website) {
-          analysis += `\n- **Website:** ${tokenData.socials.website}`
+          analysis += `\n- Website: ${tokenData.socials.website}`
         } else {
           analysis += "\n- No website found"
         }
 
         if (tokenData.socials.twitter) {
-          analysis += `\n- **Twitter:** @${tokenData.socials.twitter} - [Check Twitter activity](https://twitter.com/${tokenData.socials.twitter})`
+          analysis += `\n- Twitter: @${tokenData.socials.twitter} - Check Twitter activity: https://twitter.com/${tokenData.socials.twitter}`
         } else {
           analysis += "\n- No Twitter account found"
         }
@@ -881,7 +881,7 @@ ${tokenData.createdAt ? `- **Created:** ${new Date(tokenData.createdAt).toLocale
 
       // If we have a note about limited data, add it
       if (note) {
-        analysis += `\n\n**Note:** ${note}`
+        analysis += `\n\nNote: ${note}`
       }
 
       return { success: true, analysis }
@@ -891,9 +891,9 @@ ${tokenData.createdAt ? `- **Created:** ${new Date(tokenData.createdAt).toLocale
     return {
       success: false,
       error: "Token not found",
-      analysis: `## Token Not Found
+      analysis: `Token Not Found
 
-The token address \`${address}\` was not found in DexScreener.
+The token address ${address} was not found in DexScreener.
 
 This could be because:
 - The token is very new and not yet indexed
@@ -902,23 +902,23 @@ This could be because:
 - It might be a personal token or NFT, not a tradable token
 
 You can try checking this address directly on:
-- [Solscan](https://solscan.io/account/${address})
-- [DexScreener](https://dexscreener.com/solana/${address})
-- [Solana Explorer](https://explorer.solana.io/address/${address})`,
+- Solscan: https://solscan.io/account/${address}
+- DexScreener: https://dexscreener.com/solana/${address}
+- Solana Explorer: https://explorer.solana.io/address/${address}`,
     }
   } catch (error: any) {
     console.error("Error analyzing token:", error)
     return {
       success: false,
       error: error.message || "Error analyzing token",
-      analysis: `## Error Analyzing Token
+      analysis: `Error Analyzing Token
 
 There was an error while analyzing this token: ${error.message || "Unknown error"}
 
 You can try checking this address directly on:
-- [Solscan](https://solscan.io/account/${address})
-- [DexScreener](https://dexscreener.com/solana/${address})
-- [Solana Explorer](https://explorer.solana.io/address/${address})`,
+- Solscan: https://solscan.io/account/${address}
+- DexScreener: https://dexscreener.com/solana/${address}
+- Solana Explorer: https://explorer.solana.io/address/${address}`,
     }
   }
 }

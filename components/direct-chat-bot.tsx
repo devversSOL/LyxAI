@@ -529,9 +529,14 @@ Please try again in a moment, or ask me any other questions about Solana!`,
         <div className="p-4 border-b border-purple-900/30 flex justify-between items-center bg-[#1a1a3a]/50">
           <div className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-purple-400" />
-            <h2 className="text-lg font-light">LyxAI Wallet Assistant</h2>
+            <h2 className="text-lg font-light text-white">LyxAI Wallet Assistant</h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full hover:bg-purple-900/20">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="h-8 w-8 rounded-full hover:bg-purple-900/20 text-white"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -563,7 +568,7 @@ Please try again in a moment, or ask me any other questions about Solana!`,
                     {message.role === "user" ? "You" : "LyxAI"}
                   </span>
                 </div>
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                <p className="text-sm whitespace-pre-wrap text-white">{message.content}</p>
 
                 {/* Show wallet data if available */}
                 {message.walletData && (
@@ -727,7 +732,7 @@ Please try again in a moment, or ask me any other questions about Solana!`,
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                   <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
-                  <p className="text-sm">Analyzing wallet...</p>
+                  <p className="text-sm text-white">Analyzing wallet...</p>
                 </div>
               </div>
             </div>
@@ -744,7 +749,7 @@ Please try again in a moment, or ask me any other questions about Solana!`,
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Paste a Solana wallet address to analyze trading performance..."
-              className="bg-[#0a0a18] border-purple-900/30 focus-visible:ring-purple-500"
+              className="bg-[#0a0a18] border-purple-900/30 focus-visible:ring-purple-500 text-white"
               disabled={isLoading}
             />
             <Button
