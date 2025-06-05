@@ -130,7 +130,7 @@ export default function Home() {
                   <Twitter size={20} />
                 </Link>
                 <Link
-                  href="https://github.com/solf-ops/LyxAI"
+                  href="https://github.com/devversSOL/LyxAI"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-purple-400 hover:text-purple-300 transition-colors"
@@ -246,9 +246,9 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Backed by section */}
+              {/* Powered by section */}
               <div className="w-full">
-                <h3 className="text-base font-light text-gray-400 mb-4 text-center">Backed by</h3>
+                <h3 className="text-base font-light text-gray-400 mb-4 text-center">Powered by</h3>
                 <div className="flex flex-wrap justify-center items-center gap-8">
                   {/* Solana Logo */}
                   <div className="relative h-8 w-24">
