@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import {
   X,
   Send,
+  Bot,
   User,
   Loader2,
   AlertTriangle,
@@ -19,7 +20,7 @@ import {
   Users,
   Brain,
 } from "lucide-react"
-import { generateWalletOpinion } from "@/app/actions/openai-actions"
+import { generateChatResponse, generateWalletOpinion } from "@/app/actions/openai-actions"
 import { Badge } from "@/components/ui/badge"
 
 interface Message {
@@ -73,26 +74,27 @@ interface WalletAnalysisData {
 interface DirectChatBotProps {
   isOpen: boolean
   onClose: () => void
-  prefilledAddress?: string | null
 }
 
-// Fallback response function in case the API fails
-const generateFallbackResponse = (input: string): string => {
-  // Check if input looks like a Solana address (simplified check)
-  const isSolanaAddress = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(input.trim())
+// Update the generateFallbackResponse function to remove toLowerCase() calls
+const generateFallbackResponse = (input: string | undefined): string => {
+  // Ensure input is a string
+  const safeInput = input || ""
 
-  if (!isSolanaAddress) {
-    return "I need a Solana wallet address to analyze. Please provide a valid Solana address (typically 32-44 characters starting with a letter or number)."
+  // Use case-insensitive regex instead of toLowerCase()
+  if (/wallet|address/i.test(safeInput)) {
+    return "To look up a Solana wallet address, you can use explorers like Solscan (solscan.io), Solana Explorer (explorer.solana.com), or Solana FM (solana.fm). Simply paste the wallet address into the search bar of any of these explorers to view its balance, transaction history, and token holdings."
   }
 
-  return `I'm currently having trouble connecting to my analysis service, but I can tell you that ${input.substring(0, 8)}... appears to be a Solana wallet address. 
+  if (/transaction|tx/i.test(safeInput)) {
+    return "To analyze a Solana transaction, copy the transaction ID (a long string of characters) and paste it into Solscan or Solana Explorer. This will show you the sender, receiver, amount transferred, transaction fee, and other details about the transaction."
+  }
 
-You can check this wallet's details on:
-- [Solscan](https://solscan.io/account/${input})
-- [Solana Explorer](https://explorer.solana.com/address/${input})
-- [GMGN.ai](https://gmgn.ai/sol/address/${input})
+  if (/token|nft/i.test(safeInput)) {
+    return "Solana tokens and NFTs can be viewed on explorers like Solscan. You can see details like the token's supply, holders, and transaction history. For NFTs, you can also use specialized marketplaces like Magic Eden to view the collection and trading history."
+  }
 
-These platforms will show you the wallet's token holdings, transaction history, and trading performance.`
+  return "I'm currently having trouble connecting to my knowledge base, but I can help with basic Solana blockchain questions. You can look up wallet addresses, transactions, and tokens using explorers like Solscan (solscan.io) or Solana Explorer (explorer.solana.com). For more specific information, please try again later when my connection is restored."
 }
 
 // Simple function to detect if input looks like a Solana address
@@ -347,18 +349,17 @@ async function getWalletInfoFromAPI(address: string): Promise<WalletAnalysisData
   }
 }
 
-function DirectChatBot({ isOpen, onClose, prefilledAddress = null }: DirectChatBotProps) {
+export default function DirectChatBot({ isOpen, onClose }: DirectChatBotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
       content:
-        "Hello! I'm the Solana Wallet Analyzer. Paste any Solana wallet address, and I'll analyze its trading performance, token holdings, and recent activity. I can help you understand if this is a smart money wallet worth following.",
+        "Hello! I'm LyxAI, your Solana wallet assistant. Paste any Solana wallet address and I'll analyze its trading performance, holdings, and activity. I specialize in wallet analysis - for token contracts, use our 'Why did it send?' analyzer.",
     },
   ])
-  const [input, setInput] = useState(prefilledAddress || "")
+  const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [errorDetails, setErrorDetails] = useState<string | null>(null)
-  const [apiFailCount, setApiFailCount] = useState(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -371,101 +372,144 @@ function DirectChatBot({ isOpen, onClose, prefilledAddress = null }: DirectChatB
     }
   }, [isOpen])
 
-  // Auto-analyze prefilled address
-  useEffect(() => {
-    if (prefilledAddress && isOpen) {
-      console.log("🔄 Auto-analyzing prefilled address:", prefilledAddress)
-      handleSendMessage(prefilledAddress)
-    }
-  }, [prefilledAddress, isOpen])
-
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  // Handle sending a message
-  const handleSendMessage = async (overrideInput?: string) => {
-    const messageText = overrideInput || input
+  // Handle sending a message using server action
+  const handleSendMessage = async () => {
+    // Don't proceed if there's no input or if we're already loading
+    if (!input.trim() || isLoading) return
 
-    if (!messageText.trim() || isLoading) return
-
+    // Get the user's input and create a user message
+    const userContent = input.trim()
     const userMessage: Message = {
       role: "user",
-      content: messageText,
+      content: userContent,
     }
 
+    // Update UI state
     setMessages((prev) => [...prev, userMessage])
-    if (!overrideInput) setInput("")
+    setInput("")
     setIsLoading(true)
     setErrorDetails(null)
 
-    // Check if we should use fallback mode (after 2 consecutive API failures)
-    const useFallback = apiFailCount >= 2
-
-    if (!useFallback) {
+    // Check if this looks like a Solana address
+    if (isSolanaAddress(userContent)) {
       try {
-        console.log("Sending request to wallet-info API...")
+        // Use proper API to check if it's a wallet or token
+        console.log("🔍 Checking if address is wallet or token:", userContent)
+        const addressType = await checkAddressTypeWithAPI(userContent)
 
-        // Use the API route
-        const response = await fetch("/api/wallet-info", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messages: [...messages, userMessage],
-          }),
-        })
+        if (addressType.isToken) {
+          console.log("✅ Confirmed as token contract, showing redirect")
+          const tokenRedirectMessage: Message = {
+            role: "assistant",
+            content: `## Token Contract Detected
 
-        const data = await response.json()
+The address \`${userContent}\` appears to be a token contract, not a wallet address.
 
-        if (!response.ok) {
-          throw new Error(data.details || data.error || "Unknown error occurred")
+For token analysis and to understand "why did it send" to your wallet, please use our specialized contract analyzer.`,
+            addressType: "contract",
+            showRedirectButton: true,
+            tokenAddress: userContent,
+          }
+
+          setMessages((prev) => [...prev, tokenRedirectMessage])
+          setIsLoading(false)
+          return
+        } else {
+          console.log("✅ Confirmed as wallet address, proceeding with wallet analysis")
+
+          // Fetch wallet data using our API route
+          const walletData = await getWalletInfoFromAPI(userContent)
+
+          if (walletData) {
+            console.log("✅ Successfully fetched wallet data")
+
+            // Create a message with the wallet analysis data
+            const walletAnalysisMessage: Message = {
+              role: "assistant",
+              content: `## Wallet Analysis: ${userContent.slice(0, 4)}...${userContent.slice(-4)}
+
+${walletData.summary || ""}
+
+**Performance Metrics:**
+- Win Rate: ${walletData.performance?.winRate || "Unknown"}
+- Total Profit: ${walletData.performance?.pnl || "Unknown"}
+- 30-Day Profit: ${walletData.performance?.recentProfit30d || "Unknown"}
+- 7-Day Profit: ${walletData.performance?.recentProfit7d || "Unknown"}
+- Portfolio Value: ${walletData.performance?.totalValue || "Unknown"}
+- SOL Balance: ${walletData.performance?.solBalance || "Unknown"} SOL
+
+Check the wallet details below for holdings and recent activity.`,
+              addressType: "wallet",
+              walletData: walletData,
+            }
+
+            setMessages((prev) => [...prev, walletAnalysisMessage])
+            setIsLoading(false)
+            return
+          } else {
+            // If we couldn't get wallet data, show a fallback message
+            const fallbackMessage: Message = {
+              role: "assistant",
+              content: `## Wallet Address Detected
+
+I've identified \`${userContent}\` as a wallet address, but I'm having trouble fetching detailed analysis data right now.
+
+You can view this wallet on [Solscan](https://solscan.io/account/${userContent}) or [Solana Explorer](https://explorer.solana.com/address/${userContent}) for basic information.
+
+Please try again in a moment, or ask me any other questions about Solana!`,
+              addressType: "wallet",
+            }
+
+            setMessages((prev) => [...prev, fallbackMessage])
+            setIsLoading(false)
+            return
+          }
         }
-
-        if (data.error) {
-          throw new Error(data.details || data.error)
-        }
-
-        // Add assistant response to messages
-        const assistantMessage: Message = {
-          role: "assistant",
-          content: data.response,
-        }
-
-        setMessages((prev) => [...prev, assistantMessage])
-        setApiFailCount(0) // Reset fail count on success
-      } catch (error: any) {
-        console.error("Error generating response:", error)
-        setApiFailCount((prev) => prev + 1) // Increment fail count
-
-        // Store error details for debugging
-        setErrorDetails(error.message || "Unknown error")
-
-        // Use fallback response
-        const fallbackContent = generateFallbackResponse(messageText)
-        const fallbackMessage: Message = {
-          role: "assistant",
-          content: fallbackContent,
-          isError: true,
-        }
-
-        setMessages((prev) => [...prev, fallbackMessage])
+      } catch (error) {
+        console.error("❌ Error checking address type:", error)
+        // If there's an error checking the address type, proceed with normal chat
+        console.log("⚠️ Proceeding with normal chat due to address check error")
       }
-    } else {
-      // Use fallback directly
-      console.log("Using fallback response after multiple API failures")
-      const fallbackContent = generateFallbackResponse(messageText)
+    }
+
+    try {
+      // Call the server action to generate a response
+      const result = await generateChatResponse(userContent)
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to generate response: " + (result.details || "Unknown error"))
+      }
+
+      // Create and add the assistant message
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: result.response,
+      }
+
+      setMessages((prev) => [...prev, assistantMessage])
+    } catch (error: any) {
+      console.error("Error generating response:", error)
+
+      // Store error details for debugging
+      setErrorDetails(error.message || "Unknown error")
+
+      // Use fallback response
+      const fallbackContent = generateFallbackResponse(userContent)
       const fallbackMessage: Message = {
         role: "assistant",
         content: fallbackContent,
+        isError: true,
       }
 
       setMessages((prev) => [...prev, fallbackMessage])
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   // Handle key press (Enter to send)
@@ -484,8 +528,8 @@ function DirectChatBot({ isOpen, onClose, prefilledAddress = null }: DirectChatB
         {/* Header */}
         <div className="p-4 border-b border-purple-900/30 flex justify-between items-center bg-[#1a1a3a]/50">
           <div className="flex items-center gap-2">
-            <Search className="h-5 w-5 text-purple-400" />
-            <h2 className="text-lg font-light">Wallet Analyzer</h2>
+            <Bot className="h-5 w-5 text-purple-400" />
+            <h2 className="text-lg font-light">LyxAI Wallet Assistant</h2>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full hover:bg-purple-900/20">
             <X className="h-4 w-4" />
@@ -510,13 +554,13 @@ function DirectChatBot({ isOpen, onClose, prefilledAddress = null }: DirectChatB
                     message.isError ? (
                       <AlertTriangle className="h-4 w-4 text-red-400" />
                     ) : (
-                      <Search className="h-4 w-4 text-purple-400" />
+                      <Bot className="h-4 w-4 text-purple-400" />
                     )
                   ) : (
                     <User className="h-4 w-4 text-purple-400" />
                   )}
                   <span className="text-xs text-purple-300 font-medium">
-                    {message.role === "user" ? "You" : "Wallet Analyzer"}
+                    {message.role === "user" ? "You" : "LyxAI"}
                   </span>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -678,8 +722,8 @@ function DirectChatBot({ isOpen, onClose, prefilledAddress = null }: DirectChatB
             <div className="flex justify-start">
               <div className="max-w-[80%] rounded-lg p-3 bg-[#1a1a3a]/50 border border-purple-900/20">
                 <div className="flex items-center gap-2">
-                  <Search className="h-4 w-4 text-purple-400" />
-                  <span className="text-xs text-purple-300 font-medium">Wallet Analyzer</span>
+                  <Bot className="h-4 w-4 text-purple-400" />
+                  <span className="text-xs text-purple-300 font-medium">LyxAI</span>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                   <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
@@ -699,12 +743,12 @@ function DirectChatBot({ isOpen, onClose, prefilledAddress = null }: DirectChatB
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Paste a Solana wallet address (e.g., 5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp...)"
+              placeholder="Paste a Solana wallet address to analyze trading performance..."
               className="bg-[#0a0a18] border-purple-900/30 focus-visible:ring-purple-500"
               disabled={isLoading}
             />
             <Button
-              onClick={() => handleSendMessage()}
+              onClick={handleSendMessage}
               disabled={!input.trim() || isLoading}
               className="bg-purple-900 hover:bg-purple-800"
             >
@@ -712,12 +756,11 @@ function DirectChatBot({ isOpen, onClose, prefilledAddress = null }: DirectChatB
             </Button>
           </div>
           <p className="text-xs text-zinc-500 mt-2">
-            Paste any Solana wallet address to analyze its trading performance and activity.
+            LyxAI provides Solana wallet analysis and trading insights. Your conversations may be reviewed to improve
+            our service.
           </p>
         </div>
       </Card>
     </div>
   )
 }
-
-export default DirectChatBot

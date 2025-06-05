@@ -1,19 +1,13 @@
 import type React from "react"
-import "./globals.css"
+import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provider"
-import FloatingChatButton from "@/components/floating-chat-button"
-import FloatingAnalyzerButton from "@/components/floating-analyzer-button"
+import "./globals.css"
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  weight: ["100", "200", "300", "400", "500", "600", "700"],
-})
+const inter = Inter({ subsets: ["latin"] })
 
-export const metadata = {
-  title: "LyxAI - Blockchain Insight With Precision",
-  description: "AI-powered engine that delivers instant, data-driven answers to your wallet questions",
+export const metadata: Metadata = {
+  title: "LyxAI - Blockchain Intelligence Platform",
+  description: "Advanced AI-powered blockchain analytics and wallet intelligence platform",
     generator: 'v0.dev'
 }
 
@@ -23,14 +17,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={inter.variable}>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
-          <FloatingChatButton />
-          <FloatingAnalyzerButton />
-        </ThemeProvider>
-      </body>
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }

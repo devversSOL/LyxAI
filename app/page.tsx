@@ -11,7 +11,6 @@ import ChatBot from "@/components/chat-bot"
 import ContractAnalyzerBot from "@/components/contract-analyzer-bot"
 import DirectContractAnalyzer from "@/components/direct-contract-analyzer"
 import DirectChatBot from "@/components/direct-chat-bot"
-import AnimatedTitle from "@/components/animated-title"
 import { Button } from "@/components/ui/button"
 import { Twitter, Github, Menu, X } from "lucide-react"
 
@@ -117,12 +116,12 @@ export default function Home() {
         {/* Main content */}
         <div className="relative z-10 flex flex-col h-full">
           {/* Header with logo and navigation */}
-          <header className="container mx-auto py-2 px-4 flex-shrink-0">
+          <header className="container mx-auto py-4 px-4 flex-shrink-0">
             <div className="flex justify-between items-center w-full">
               {/* Left side - Social links */}
               <div className="flex items-center gap-3">
                 <Link
-                  href="https://twitter.com/LyxAI_"
+                  href="https://x.com/Lyxdotai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-purple-400 hover:text-purple-300 transition-colors"
@@ -130,7 +129,7 @@ export default function Home() {
                   <Twitter size={20} />
                 </Link>
                 <Link
-                  href="https://github.com/LyxAI"
+                  href="https://github.com/solf-ops/LyxAI"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-purple-400 hover:text-purple-300 transition-colors"
@@ -139,20 +138,13 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Center - Logo */}
+              {/* Center - LYXAI Text Logo */}
               <div className="absolute left-1/2 transform -translate-x-1/2">
-                <div className="w-32 sm:w-36 md:w-40 flex items-center">
-                  <img
-                    src="/lyxai-logo-main.png"
-                    alt="LyxAI"
-                    className="w-full h-auto"
-                    style={{ filter: "drop-shadow(0 0 10px rgba(168, 85, 247, 0.5))" }}
-                  />
-                </div>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-wider text-white">LYXAI</h1>
               </div>
 
               {/* Right side - Navigation */}
-              <nav className="flex items-center gap-6">
+              <nav className="flex items-center gap-6 relative">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -164,27 +156,27 @@ export default function Home() {
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-[#0a0a18]/90 backdrop-blur-sm border border-purple-900/30 rounded-md shadow-lg py-1 z-50">
+                  <div className="absolute right-0 top-12 w-48 bg-black/95 backdrop-blur-md border border-purple-900/50 rounded-lg shadow-2xl py-3 z-[9999]">
+                    <Link
+                      href="/"
+                      className="block px-5 py-3 text-white hover:bg-purple-900/30 transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Home
+                    </Link>
                     <Link
                       href="/dashboard"
-                      className="block px-4 py-2 text-sm text-gray-200 hover:bg-purple-900/20"
+                      className="block px-5 py-3 text-white hover:bg-purple-900/30 transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Dashboard
                     </Link>
                     <Link
                       href="/docs"
-                      className="block px-4 py-2 text-sm text-gray-200 hover:bg-purple-900/20"
+                      className="block px-5 py-3 text-white hover:bg-purple-900/30 transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Documentation
-                    </Link>
-                    <Link
-                      href="/saved-wallets"
-                      className="block px-4 py-2 text-sm text-gray-200 hover:bg-purple-900/20"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Saved Wallets
                     </Link>
                   </div>
                 )}
@@ -192,49 +184,53 @@ export default function Home() {
             </div>
           </header>
 
-          {/* Main content - positioned higher */}
-          <main className="container mx-auto px-4 flex-1 flex flex-col justify-start items-center pt-16 md:pt-20">
-            <div className="flex flex-col items-center justify-start text-center relative max-w-4xl">
-              {/* Animated Title */}
-              <div className="mb-3">
-                <AnimatedTitle />
+          {/* Main content - centered */}
+          <main className="container mx-auto px-4 flex-1 flex flex-col justify-center items-center">
+            <div className="flex flex-col items-center justify-center text-center relative max-w-4xl">
+              {/* Main Title */}
+              <div className="mb-6">
+                <h2 className="text-4xl md:text-6xl lg:text-7xl font-light leading-tight">
+                  <span className="text-purple-400">Blockchain</span> <span className="text-white">insight</span>
+                  <br />
+                  <span className="text-white">with precision</span>
+                </h2>
               </div>
 
-              <p className="text-zinc-400 text-sm mb-5 font-extralight max-w-xl leading-relaxed">
+              <p className="text-zinc-400 text-lg mb-8 font-light max-w-2xl leading-relaxed">
                 LyxAI delivers instant, data-driven answers to your wallet questions.
                 <br />
                 From token buys and sells to current holdings, our AI-powered engine reveals exactly what you need—no
                 noise, just truth.
               </p>
 
-              <div className="flex flex-col md:flex-row gap-3 items-center mb-5">
+              <div className="flex flex-col md:flex-row gap-4 items-center mb-12">
                 <Button
                   onClick={openChat}
-                  className="glass-button destructured-button px-6 py-3 rounded-full flex items-center transform rotate-1 cursor-pointer"
+                  className="bg-transparent border border-white/30 hover:bg-white/10 text-white px-8 py-3 rounded-full flex items-center gap-2 transition-all duration-300"
                 >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" strokeWidth="1.5" />
-                    <path d="M9 12L15 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M9 12L15 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
-                  <span className="font-light text-sm">Analyze Wallet</span>
+                  <span className="font-light">Analyze Wallet</span>
                 </Button>
 
                 <Button
                   onClick={openAnalyzer}
-                  className="glass-button px-6 py-3 rounded-full flex items-center cursor-pointer hover:bg-white/10 transition-all duration-300"
+                  className="bg-transparent border border-white/30 hover:bg-white/10 text-white px-8 py-3 rounded-full flex items-center gap-2 transition-all duration-300"
                 >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="1.5" />
-                    <path d="M16.5 16.5L21 21" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
-                  <span className="font-light text-sm">Why did it send?</span>
+                  <span className="font-light">Why did it send?</span>
                 </Button>
               </div>
 
-              {/* Backed by section - Compact */}
+              {/* Backed by section */}
               <div className="w-full">
-                <h2 className="text-base font-extralight text-gray-400 mb-2 text-center">Backed by</h2>
-                <div className="flex flex-wrap justify-center items-center gap-4">
+                <h3 className="text-base font-light text-gray-400 mb-4 text-center">Backed by</h3>
+                <div className="flex flex-wrap justify-center items-center gap-8">
                   {/* Solana Logo */}
                   <div className="relative h-8 w-24">
                     <Image

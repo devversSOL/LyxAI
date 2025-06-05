@@ -115,13 +115,6 @@ export async function GET(request: NextRequest) {
 
     const result = await checkAddressTypeWithHelius(address)
 
-    console.log("📊 Final result for component:", {
-      address,
-      isWallet: result.isWallet,
-      isToken: result.isToken,
-      success: true,
-    })
-
     return NextResponse.json({
       address,
       isWallet: result.isWallet,
