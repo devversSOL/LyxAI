@@ -139,9 +139,18 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Center - LYXAI Text Logo */}
+              {/* Center - LYXAI Image Logo with Glow Effect */}
               <div className="absolute left-1/2 transform -translate-x-1/2">
-                <h1 className="text-2xl md:text-3xl font-bold tracking-wider text-white">LYXAI</h1>
+                <div className="relative h-30 w-96 md:h-36 md:w-120 glow-effect">
+                  <Image
+                    src="/lyxai-text-logo.png"
+                    alt="LYXAI"
+                    fill
+                    style={{ objectFit: "contain" }}
+                    className="brightness-0 invert drop-shadow-glow animate-pulse-subtle"
+                    priority
+                  />
+                </div>
               </div>
 
               {/* Right side - Navigation */}
