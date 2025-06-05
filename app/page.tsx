@@ -203,7 +203,7 @@ export default function Home() {
                 noise, just truth.
               </p>
 
-              <div className="flex flex-col md:flex-row gap-4 items-center mb-12">
+              <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
                 <Button
                   onClick={openChat}
                   className="bg-transparent border border-white/30 hover:bg-white/10 text-white px-8 py-3 rounded-full flex items-center gap-2 transition-all duration-300"
@@ -225,6 +225,19 @@ export default function Home() {
                   </svg>
                   <span className="font-light">Why did it send?</span>
                 </Button>
+              </div>
+
+              {/* Third button - Watch Whale Activity */}
+              <div className="mb-12">
+                <Link href="/dashboard">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-full flex items-center gap-2 transition-all duration-300">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" stroke="currentColor" strokeWidth="1.5" />
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+                    </svg>
+                    <span className="font-light">Watch Whale Activity</span>
+                  </Button>
+                </Link>
               </div>
 
               {/* Backed by section */}

@@ -45,7 +45,7 @@ function ContractAnalyzerBot({ isOpen, onClose }: ContractAnalyzerBotProps) {
     {
       role: "assistant",
       content:
-        "Hello! I'm the Solana Contract Analyzer. Paste any Solana contract address or SPL token, and I'll tell you why it might have been sent to you. I'll analyze the token creator's reputation on X (Twitter), check if they're famous or known, and determine if the token is part of a viral trend on social media platforms.",
+        "Hello! I'm the Solana Contract Analyzer. Paste any Solana **token contract address** or SPL token, and I'll tell you why it might have been sent to you. I'll analyze the token creator's reputation on X (Twitter), check if they're famous or known, and determine if the token is part of a viral trend on social media platforms.\n\n**Note:** If you want to analyze a wallet address, please use our dedicated Wallet Analyzer tool instead.",
     },
   ])
   const [input, setInput] = useState("")
@@ -82,6 +82,52 @@ function ContractAnalyzerBot({ isOpen, onClose }: ContractAnalyzerBotProps) {
     setInput("")
     setIsLoading(true)
     setErrorDetails(null)
+
+    // Check if input looks like a Solana address and determine if it's a wallet
+    const isSolanaAddress = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(input.trim())
+
+    if (isSolanaAddress) {
+      try {
+        // Check if it's a wallet using a simple heuristic or API call
+        const response = await fetch("/api/check-address-type", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: input.trim() }),
+        })
+
+        const addressData = await response.json()
+
+        if (addressData.isWallet) {
+          // Show wallet redirect message
+          const walletRedirectMessage: Message = {
+            role: "assistant",
+            content: `## Wallet Address Detected
+
+The address \`${input.trim()}\` appears to be a wallet address, not a token contract.
+
+For wallet analysis including trading performance, holdings, and activity history, please use our specialized wallet analyzer.`,
+          }
+
+          setMessages((prev) => [...prev, walletRedirectMessage])
+          setIsLoading(false)
+
+          // Add redirect button after a short delay
+          setTimeout(() => {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: "REDIRECT_BUTTON_WALLET",
+              },
+            ])
+          }, 500)
+
+          return
+        }
+      } catch (error) {
+        console.log("Could not determine address type, proceeding with contract analysis")
+      }
+    }
 
     // Check if we should use fallback mode (after 2 consecutive API failures)
     const useFallback = apiFailCount >= 2
@@ -210,6 +256,25 @@ function ContractAnalyzerBot({ isOpen, onClose }: ContractAnalyzerBotProps) {
                     <p>Error details (for debugging): {errorDetails}</p>
                   </div>
                 )}
+                {message.content === "REDIRECT_BUTTON_WALLET" && (
+                  <div className="mt-3">
+                    <Button
+                      onClick={() => {
+                        onClose() // Close current analyzer
+                        // Trigger opening the wallet analyzer
+                        window.dispatchEvent(
+                          new CustomEvent("openWalletAnalyzer", {
+                            detail: { address: input.trim() },
+                          }),
+                        )
+                      }}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center gap-2"
+                    >
+                      <User className="h-4 w-4" />
+                      Open Wallet Analyzer
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -238,7 +303,7 @@ function ContractAnalyzerBot({ isOpen, onClose }: ContractAnalyzerBotProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Paste a Solana address (e.g., 5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp...)"
+              placeholder="Paste a Solana token contract address (e.g., 5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp...)"
               className="bg-[#0a0a18] border-purple-900/30 focus-visible:ring-purple-500"
               disabled={isLoading}
             />
@@ -251,7 +316,8 @@ function ContractAnalyzerBot({ isOpen, onClose }: ContractAnalyzerBotProps) {
             </Button>
           </div>
           <p className="text-xs text-zinc-500 mt-2">
-            Paste any Solana contract address or SPL token to analyze why it might have been sent to you.
+            Paste any Solana token contract address to analyze why it might have been sent to you. For wallet analysis,
+            use the Wallet Analyzer tool.
           </p>
         </div>
       </Card>
