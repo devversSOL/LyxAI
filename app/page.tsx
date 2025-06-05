@@ -13,6 +13,7 @@ import DirectContractAnalyzer from "@/components/direct-contract-analyzer"
 import DirectChatBot from "@/components/direct-chat-bot"
 import { Button } from "@/components/ui/button"
 import { Twitter, Github, Menu, X } from "lucide-react"
+import AnimatedTitle from "@/components/animated-title"
 
 // Dynamically import the 3D background to avoid SSR issues
 const BackgroundScene = dynamic(() => import("@/components/background-scene"), { ssr: false })
@@ -189,11 +190,7 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center text-center relative max-w-4xl">
               {/* Main Title */}
               <div className="mb-6">
-                <h2 className="text-4xl md:text-6xl lg:text-7xl font-light leading-tight">
-                  <span className="text-purple-400">Blockchain</span> <span className="text-white">insight</span>
-                  <br />
-                  <span className="text-white">with precision</span>
-                </h2>
+                <AnimatedTitle />
               </div>
 
               <p className="text-zinc-400 text-lg mb-8 font-light max-w-2xl leading-relaxed">
