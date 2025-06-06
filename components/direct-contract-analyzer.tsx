@@ -24,6 +24,52 @@ import {
   ArrowDownRight,
 } from "lucide-react"
 import { analyzeSolanaToken, fetchTokenData, checkAddressType } from "@/app/actions/openai-actions"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+
+// Helper function to extract Solana addresses from text
+function extractSolanaAddresses(text: string): string[] {
+  console.log("🔍 Extracting addresses from text:", text)
+
+  // Improved regex pattern for Solana addresses
+  // Solana addresses are base58 encoded, 32-44 characters, no 0, O, I, l
+  const regex = /[1-9A-HJ-NP-Za-km-z]{32,44}/g
+
+  const matches = text.match(regex) || []
+  console.log("📍 Raw regex matches:", matches)
+
+  // Filter to only valid Solana addresses (additional validation)
+  const validAddresses = matches.filter((match) => {
+    // Must be exactly 32-44 characters
+    if (match.length < 32 || match.length > 44) return false
+
+    // Must not contain invalid base58 characters
+    if (/[0OIl]/.test(match)) return false
+
+    // Additional check: most Solana addresses start with certain characters
+    // This is a loose check, not strict validation
+    return true
+  })
+
+  console.log("✅ Valid addresses found:", validAddresses)
+  return [...new Set(validAddresses)]
+}
+
+// Helper function to check if a string is likely a valid Solana address
+function isValidSolanaAddress(address: string): boolean {
+  console.log("🔍 Validating address:", address, "Length:", address.length)
+
+  // Basic validation - Solana addresses are base58 encoded
+  const isValid =
+    /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address) &&
+    address.length >= 32 &&
+    address.length <= 44 &&
+    !/[0OIl]/.test(address)
+
+  console.log("✅ Address validation result:", isValid)
+  return isValid
+}
 
 // Update the Message interface to include walletData
 interface Message {
@@ -168,13 +214,32 @@ To analyze this token:
 For security reasons, I recommend researching any token thoroughly before interacting with it.`
 }
 
+// Function to search token narratives by address
+async function searchTokenNarratives(address: string) {
+  try {
+    console.log("🔍 Searching token narratives for address:", address)
+
+    const { data: tokens, error } = await supabase.from("token_narratives").select("*").eq("address", address).limit(1)
+
+    if (error) {
+      console.error("Error searching token narratives:", error)
+      return null
+    }
+
+    console.log(`Found ${tokens?.length || 0} token narratives`)
+    return tokens && tokens.length > 0 ? tokens[0] : null
+  } catch (error) {
+    console.error("Error in searchTokenNarratives:", error)
+    return null
+  }
+}
+
 export default function DirectContractAnalyzer({ isOpen, onClose, prefilledAddress }: DirectContractAnalyzerProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "assistant",
-      content:
-        "Hello! I'm the Solana Contract Analyzer. Paste any Solana contract address or SPL token, and I'll tell you why it might have been sent to you. I'll analyze the token creator's reputation on X (Twitter), check if they're famous or known, and determine if the token is part of a viral trend on social media platforms.",
+      content: "Hello! I'm LyxAi.\nPaste your Solana Contract Address here, and i'll tell you all the details on it!",
     },
   ])
   const [input, setInput] = useState(prefilledAddress || "")
@@ -230,16 +295,28 @@ export default function DirectContractAnalyzer({ isOpen, onClose, prefilledAddre
     setErrorDetails(null)
 
     try {
-      // Check if input looks like a Solana address
-      const isSolanaAddress = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(userContent.trim())
+      // Extract addresses from the user content
+      const extractedAddresses = extractSolanaAddresses(userContent)
+      console.log("📍 Extracted addresses:", extractedAddresses)
 
-      if (!isSolanaAddress) {
+      // Use the first extracted address, or check if the entire input is an address
+      let addressToAnalyze = ""
+
+      if (extractedAddresses.length > 0) {
+        addressToAnalyze = extractedAddresses[0]
+        console.log("✅ Using extracted address:", addressToAnalyze)
+      } else if (isValidSolanaAddress(userContent.trim())) {
+        addressToAnalyze = userContent.trim()
+        console.log("✅ Using entire input as address:", addressToAnalyze)
+      } else {
         throw new Error("Please provide a valid Solana address (typically 32-44 characters).")
       }
 
+      console.log("🎯 Final address to analyze:", addressToAnalyze)
+
       // Check if the address is a wallet or token using Helius API
       console.log("Checking if address is a wallet or token...")
-      const addressTypeResult = await checkAddressType(userContent)
+      const addressTypeResult = await checkAddressType(addressToAnalyze)
 
       // Log the result for debugging
       console.log("Address type check result:", addressTypeResult)
@@ -266,7 +343,7 @@ The address \`${userContent}\` is a valid Solana wallet.
 ${
   addressTypeResult.winRate === "Unknown"
     ? ""
-    : "**Note:** Login is required on GMGN.ai to view this wallet's trading metrics and history."
+    : "Note: Login is required on GMGN.ai to view this wallet's trading metrics and history."
 }
 
 You can view detailed trading performance for this wallet on GMGN.ai by clicking the button below.
@@ -283,13 +360,13 @@ ${
   (addressTypeResult.roi && addressTypeResult.roi !== "Unknown") ||
   addressTypeResult.totalTrades ||
   addressTypeResult.profitableTrades
-    ? "**Wallet Performance:**"
+    ? "Wallet Performance:"
     : ""
 }
-${addressTypeResult.winRate && addressTypeResult.winRate !== "Unknown" ? `- **Win Rate:** ${addressTypeResult.winRate}` : ""}
-${addressTypeResult.roi && addressTypeResult.roi !== "Unknown" ? `- **ROI:** ${addressTypeResult.roi}` : ""}
-${addressTypeResult.totalTrades ? `- **Total Trades:** ${addressTypeResult.totalTrades}` : ""}
-${addressTypeResult.profitableTrades ? `- **Profitable Trades:** ${addressTypeResult.profitableTrades}` : ""}
+${addressTypeResult.winRate && addressTypeResult.winRate !== "Unknown" ? `- Win Rate: ${addressTypeResult.winRate}` : ""}
+${addressTypeResult.roi && addressTypeResult.roi !== "Unknown" ? `- ROI: ${addressTypeResult.roi}` : ""}
+${addressTypeResult.totalTrades ? `- Total Trades: ${addressTypeResult.totalTrades}` : ""}
+${addressTypeResult.profitableTrades ? `- Profitable Trades: ${addressTypeResult.profitableTrades}` : ""}
 
 You can view detailed trading performance for this wallet on GMGN.ai by clicking the button below.
 
@@ -315,9 +392,13 @@ You can also check this wallet's token holdings and transaction history on:
       // If we get here, it's a token or unknown, so proceed with token analysis
       console.log("Address is a token or unknown. Proceeding with token analysis...")
 
+      // Check if we have narrative data for this token
+      console.log("Checking for token narrative data...")
+      const tokenNarrative = await searchTokenNarratives(addressToAnalyze)
+
       // Step 1: Fetch token data from DexScreener using server action
       console.log("Fetching token data from DexScreener...")
-      const tokenDataResult = await fetchTokenData(userContent)
+      const tokenDataResult = await fetchTokenData(addressToAnalyze)
 
       let tokenData = null
       let note = undefined
@@ -328,7 +409,7 @@ You can also check this wallet's token holdings and transaction history on:
 
         // Step 2: Generate analysis using server action
         console.log("Generating token analysis...")
-        const analysisResult = await analyzeSolanaToken(userContent, tokenData, note)
+        const analysisResult = await analyzeSolanaToken(addressToAnalyze, tokenData, note)
 
         if (!analysisResult.success) {
           throw new Error(
@@ -336,8 +417,23 @@ You can also check this wallet's token holdings and transaction history on:
           )
         }
 
-        // Create the response message
-        const responseContent = analysisResult.analysis
+        // Create the response message - combine AI analysis with narrative data
+        let responseContent = analysisResult.analysis
+
+        // Add narrative analysis if we have it
+        if (tokenNarrative) {
+          responseContent += `
+
+Short Summary:
+${tokenNarrative.short_summary || "No summary available"}
+
+Full Analysis:
+${tokenNarrative.full_analysis || "No detailed analysis available"}
+
+${tokenNarrative.total_percentage ? `Bundle Percentage: ${tokenNarrative.total_percentage}%` : ""}
+
+Risk Score: ${tokenNarrative.risk_score || "Unknown"}/100`
+        }
 
         // Create and add the assistant message
         const assistantMessage: Message = {
@@ -353,7 +449,7 @@ You can also check this wallet's token holdings and transaction history on:
         if (!tokenData.image) {
           try {
             console.log("Trying to get token image from Solscan...")
-            const solscanImage = await getSolscanTokenImage(userContent)
+            const solscanImage = await getSolscanTokenImage(addressToAnalyze)
             if (solscanImage) {
               console.log("Found image from Solscan:", solscanImage)
               tokenData.image = solscanImage
@@ -367,13 +463,45 @@ You can also check this wallet's token holdings and transaction history on:
         setIframeLoading((prev) => ({ ...prev, [assistantMessage.id]: true }))
 
         setMessages((prev) => [...prev, assistantMessage])
+      } else if (tokenNarrative) {
+        // If no DexScreener data but we have narrative data, show that
+        console.log("✅ No DexScreener data but found token narrative data:", tokenNarrative)
+
+        const narrativeMessage: Message = {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content: `Token Narrative Analysis Found!
+
+${tokenNarrative.name}
+
+Short Summary:
+${tokenNarrative.short_summary || "No summary available"}
+
+Full Analysis:
+${tokenNarrative.full_analysis || "No detailed analysis available"}
+
+${tokenNarrative.total_percentage ? `Bundle Percentage: ${tokenNarrative.total_percentage}%` : ""}
+
+Risk Score: ${tokenNarrative.risk_score || "Unknown"}/100
+
+Note: This token was not found on DexScreener, but we have narrative analysis data for it.`,
+          addressType: "contract",
+          tokenData: {
+            name: tokenNarrative.name,
+            symbol: tokenNarrative.name,
+            address: addressToAnalyze,
+            isVerified: false,
+          },
+        }
+
+        setMessages((prev) => [...prev, narrativeMessage])
       } else {
-        // Handle the case where token data wasn't found
+        // Handle the case where neither token data nor narrative data was found
         const errorMessage = tokenDataResult.error || "Token not found"
         const errorDetails = tokenDataResult.details || "No additional details available"
 
         // Get the analysis from analyzeSolanaToken even for error cases
-        const analysisResult = await analyzeSolanaToken(userContent, null)
+        const analysisResult = await analyzeSolanaToken(addressToAnalyze, null)
 
         // Create and add the error message
         const errorResponseMessage: Message = {
@@ -383,7 +511,7 @@ You can also check this wallet's token holdings and transaction history on:
             analysisResult.analysis ||
             `## Address Analysis
 
-The address \`${userContent}\` was not found in DexScreener and doesn't appear to be a wallet with trading activity.
+The address \`${addressToAnalyze}\` was not found in DexScreener and doesn't appear to be in our narrative analysis database.
 
 This could be because:
 - It's a new or inactive wallet
@@ -392,8 +520,8 @@ This could be because:
 - The address may be incorrect
 
 You can try checking this address directly on:
-- [Solscan](https://solscan.io/account/${userContent})
-- [Solana Explorer](https://explorer.solana.com/address/${userContent})`,
+- [Solscan](https://solscan.io/account/${addressToAnalyze})
+- [Solana Explorer](https://explorer.solana.com/address/${addressToAnalyze})`,
           isError: true,
           addressType: "unknown",
         }

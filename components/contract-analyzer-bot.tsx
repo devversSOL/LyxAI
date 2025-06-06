@@ -44,8 +44,7 @@ function ContractAnalyzerBot({ isOpen, onClose }: ContractAnalyzerBotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "Hello! I'm the Solana Contract Analyzer. Paste any Solana **token contract address** or SPL token, and I'll tell you why it might have been sent to you. I'll analyze the token creator's reputation on X (Twitter), check if they're famous or known, and determine if the token is part of a viral trend on social media platforms.\n\n**Note:** If you want to analyze a wallet address, please use our dedicated Wallet Analyzer tool instead.",
+      content: "Hello! I'm LyxAi.\nPaste your Solana Contract Address here, and i'll tell you all the details on it!",
     },
   ])
   const [input, setInput] = useState("")
