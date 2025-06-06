@@ -1,83 +1,17 @@
 import { NextResponse } from "next/server"
 import { walletService } from "@/lib/wallet-service"
-import { createClient } from "@supabase/supabase-js"
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 // Helper function to extract Solana addresses from text
 function extractSolanaAddresses(text: string): string[] {
-  console.log("🔍 Extracting addresses from text:", text)
-
-  // Improved regex pattern for Solana addresses
-  // Solana addresses are base58 encoded, 32-44 characters, no 0, O, I, l
-  const regex = /[1-9A-HJ-NP-Za-km-z]{32,44}/g
-
-  const matches = text.match(regex) || []
-  console.log("📍 Raw regex matches:", matches)
-
-  // Filter to only valid Solana addresses (additional validation)
-  const validAddresses = matches.filter((match) => {
-    // Must be exactly 32-44 characters
-    if (match.length < 32 || match.length > 44) return false
-
-    // Must not contain invalid base58 characters
-    if (/[0OIl]/.test(match)) return false
-
-    // Additional check: most Solana addresses start with certain characters
-    // This is a loose check, not strict validation
-    return true
-  })
-
-  console.log("✅ Valid addresses found:", validAddresses)
-  return [...new Set(validAddresses)]
+  // Solana addresses are base58 encoded and typically 32-44 characters
+  const regex = /\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/g
+  return [...new Set(text.match(regex) || [])]
 }
 
 // Helper function to check if a string is likely a valid Solana address
 function isValidSolanaAddress(address: string): boolean {
-  console.log("🔍 Validating address:", address, "Length:", address.length)
-
   // Basic validation - Solana addresses are base58 encoded
-  const isValid =
-    /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address) &&
-    address.length >= 32 &&
-    address.length <= 44 &&
-    !/[0OIl]/.test(address)
-
-  console.log("✅ Address validation result:", isValid)
-  return isValid
-}
-
-// Function to search token narratives by address or name
-async function searchTokenNarratives(query: string) {
-  try {
-    console.log("🔍 Searching token narratives for:", query)
-
-    // Check if query looks like an address
-    const isAddressSearch = query.length > 30 && isValidSolanaAddress(query)
-
-    let supabaseQuery = supabase.from("token_narratives").select("*")
-
-    if (isAddressSearch) {
-      // Search by exact address
-      supabaseQuery = supabaseQuery.eq("address", query)
-    } else {
-      // Search by name (case insensitive)
-      supabaseQuery = supabaseQuery.ilike("name", `%${query}%`)
-    }
-
-    const { data: tokens, error } = await supabaseQuery.limit(5)
-
-    if (error) {
-      console.error("Error searching token narratives:", error)
-      return []
-    }
-
-    console.log(`Found ${tokens?.length || 0} token narratives`)
-    return tokens || []
-  } catch (error) {
-    console.error("Error in searchTokenNarratives:", error)
-    return []
-  }
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
 }
 
 // Function to get wallet info from the new endpoint
@@ -231,37 +165,9 @@ export async function POST(req: Request) {
     const addresses = extractSolanaAddresses(userMessage)
     console.log("📍 Extracted addresses:", addresses)
 
-    // Search for token narratives based on the user message
-    const foundTokens = await searchTokenNarratives(userMessage)
-    console.log("🎯 Found token narratives:", foundTokens.length)
-
     // Check if any of these addresses are wallets and get their info
     const foundWallets = []
     let systemPromptAddition = ""
-
-    // Add token narrative information if found
-    if (foundTokens.length > 0) {
-      systemPromptAddition += `\n\n🎯 TOKEN NARRATIVE ANALYSIS FOUND:\n`
-
-      for (const token of foundTokens) {
-        systemPromptAddition += `\nToken: ${token.name} (${token.address})\n`
-        systemPromptAddition += `Short Summary: ${token.short_summary}\n`
-
-        if (token.risk_score) {
-          systemPromptAddition += `Risk Score: ${token.risk_score}/100\n`
-        }
-
-        if (token.total_percentage) {
-          systemPromptAddition += `Total Percentage: ${token.total_percentage}%\n`
-        }
-
-        if (token.full_analysis) {
-          systemPromptAddition += `Full Analysis: ${token.full_analysis.substring(0, 500)}...\n`
-        }
-
-        systemPromptAddition += `\nThis token has detailed narrative analysis available. Provide insights based on this data.\n`
-      }
-    }
 
     if (addresses.length > 0) {
       console.log(`🔎 Checking ${addresses.length} addresses...`)
@@ -338,27 +244,7 @@ export async function POST(req: Request) {
               }
             } else if (addressType.isToken) {
               console.log(`ℹ️ ${address} is a token/coin address, not a wallet`)
-
-              // Check if we have narrative data for this token
-              const tokenNarratives = await searchTokenNarratives(address)
-              if (tokenNarratives.length > 0) {
-                const token = tokenNarratives[0]
-                systemPromptAddition += `\n\n🎯 TOKEN NARRATIVE FOUND:\n`
-                systemPromptAddition += `Token: ${token.name} (${address})\n`
-                systemPromptAddition += `Short Summary: ${token.short_summary}\n`
-
-                if (token.risk_score) {
-                  systemPromptAddition += `Risk Score: ${token.risk_score}/100\n`
-                }
-
-                if (token.full_analysis) {
-                  systemPromptAddition += `Full Analysis: ${token.full_analysis}\n`
-                }
-
-                systemPromptAddition += `\nProvide detailed insights based on this narrative analysis.\n`
-              } else {
-                systemPromptAddition += `\n\nNote: The address ${address} appears to be a token/coin address, but no narrative analysis is available in our database.\n`
-              }
+              systemPromptAddition += `\n\nNote: The address ${address} appears to be a token/coin address, not a wallet address.\n`
             } else {
               console.log(`❓ Could not determine if ${address} is a wallet or token`)
             }
@@ -370,39 +256,31 @@ export async function POST(req: Request) {
     }
 
     // Create the system prompt
-    const systemPrompt = `You are LyxAI, an AI assistant specialized in the Solana blockchain ecosystem. Your primary focus is helping users find and analyze wallets and tokens on the Solana blockchain.
+    const systemPrompt = `You are LyxAI, an AI assistant specialized in the Solana blockchain ecosystem. Your primary focus is helping users find and analyze wallets on the Solana blockchain.
 
 ${systemPromptAddition ? `${systemPromptAddition}\n` : ""}
 
 Provide detailed guidance on:
 1. How to look up Solana wallet addresses using explorers like Solscan, Solana Explorer, and Solana FM
 2. How to interpret wallet data, transaction history, and token holdings
-3. Token narrative analysis and risk assessment
-4. Best practices for wallet security and management on Solana
-5. How to track specific wallets or transactions of interest
-6. Tools and methods to analyze on-chain activity for Solana wallets
+3. Best practices for wallet security and management on Solana
+4. How to track specific wallets or transactions of interest
+5. Tools and methods to analyze on-chain activity for Solana wallets
 
 ${
-  foundWallets.length > 0 || foundTokens.length > 0
-    ? `CRITICAL: The user is asking about wallet(s) or token(s) that we have analysis data for. Start your response by providing the detailed analysis and insights based on the data provided above.`
-    : `When users ask about finding wallets or tokens, provide specific steps using Solana explorers and tools.`
+  foundWallets.length > 0
+    ? `CRITICAL: The user is asking about wallet(s) that we have analysis data for. Start your response by providing the detailed wallet analysis and insights based on the data provided above.`
+    : `When users ask about finding wallets, provide specific steps using Solana explorers and tools.`
 }
 
 Include relevant Solana-specific terminology and explain concepts clearly. Be friendly and conversational while maintaining technical accuracy.`
 
-    console.log("📝 System prompt created with data:", foundWallets.length > 0 || foundTokens.length > 0 ? "YES" : "NO")
+    console.log("📝 System prompt created with wallet info:", foundWallets.length > 0 ? "YES" : "NO")
 
     if (foundWallets.length > 0) {
       console.log(
         "🎯 Found wallets to include:",
         foundWallets.map((w) => w.address),
-      )
-    }
-
-    if (foundTokens.length > 0) {
-      console.log(
-        "🎯 Found tokens to include:",
-        foundTokens.map((t) => t.name),
       )
     }
 
