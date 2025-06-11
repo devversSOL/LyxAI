@@ -8,12 +8,14 @@ function validateWhaleMessage(content: string): boolean {
     return false
   }
 
-  // Check for required patterns in the new format
-  const hasWhaleName = /A\s+\$([A-Z0-9]+)\s+whale/i.test(content)
+  // Check for required patterns in the new format - UPDATED PATTERNS
+  const hasWhaleName = /A\s+\$([A-Z0-9\s]+)\s+whale/i.test(content) // Allow spaces in whale names
   const hasBuyAmount = /bought\s+(\$[0-9.]+[KMB])\s+of/i.test(content)
   const hasToken = /of\s+\$([A-Z0-9]+)(?:\s+at|\s|$)/i.test(content)
   const hasMarketCap = /at\s+(\$[0-9.]+[KMB])\s+MC/i.test(content)
-  const hasAssetDashUrl = /https:\/\/app\.assetdash\.com\/solana\/([A-Za-z0-9]+)/i.test(content)
+  // Make URL optional since messages might be truncated
+  const hasAssetDashUrl =
+    /https?:\/\/[^\s]+/i.test(content) || content.includes("screener.com") || content.includes("assetdash.com")
 
   console.log("Message validation:", {
     hasWhaleName,
@@ -24,7 +26,7 @@ function validateWhaleMessage(content: string): boolean {
     content: content.substring(0, 100),
   })
 
-  // All required fields must be present
+  // All required fields must be present (URL is now more flexible)
   return hasWhaleName && hasBuyAmount && hasToken && hasMarketCap && hasAssetDashUrl
 }
 

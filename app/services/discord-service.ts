@@ -74,12 +74,14 @@ function validateWhaleMessage(content: string): boolean {
     return false
   }
 
-  // Check for required patterns in the new format
-  const hasWhaleName = /A\s+\$([A-Z0-9]+)\s+whale/i.test(content)
+  // Check for required patterns in the new format - UPDATED PATTERNS
+  const hasWhaleName = /A\s+\$([A-Z0-9\s]+)\s+whale/i.test(content) // Allow spaces in whale names
   const hasBuyAmount = /bought\s+(\$[0-9.]+[KMB])\s+of/i.test(content)
   const hasToken = /of\s+\$([A-Z0-9]+)(?:\s+at|\s|$)/i.test(content)
   const hasMarketCap = /at\s+(\$[0-9.]+[KMB])\s+MC/i.test(content)
-  const hasAssetDashUrl = /https:\/\/app\.assetdash\.com\/solana\/([A-Za-z0-9]+)/i.test(content)
+  // Make URL optional since messages might be truncated
+  const hasAssetDashUrl =
+    /https?:\/\/[^\s]+/i.test(content) || content.includes("screener.com") || content.includes("assetdash.com")
 
   console.log("Validation results:", {
     hasWhaleName,
@@ -90,7 +92,7 @@ function validateWhaleMessage(content: string): boolean {
     content: content.substring(0, 100),
   })
 
-  // All required fields must be present
+  // All required fields must be present (URL is now more flexible)
   return hasWhaleName && hasBuyAmount && hasToken && hasMarketCap && hasAssetDashUrl
 }
 
@@ -237,15 +239,18 @@ export function parseWhaleActivity(messages: DiscordMessage[]): WhaleActivity[] 
           const mcMatch = message.content.match(/at\s+(\$[0-9.]+[KMB])\s+MC/i)
           const marketCap = mcMatch ? mcMatch[1] : "Unknown"
 
-          // NEW: Extract biggest win (whale name) - pattern: "A $NAME whale"
-          const biggestWinMatch = message.content.match(/A\s+\$([A-Z0-9]+)\s+whale/i)
-          const biggestWin = biggestWinMatch ? `$${biggestWinMatch[1]}` : "Unknown"
+          // NEW: Extract biggest win (whale name) - pattern: "A $NAME whale" - UPDATED PATTERN
+          const biggestWinMatch = message.content.match(/A\s+\$([A-Z0-9\s]+)\s+whale/i)
+          const biggestWin = biggestWinMatch ? `$${biggestWinMatch[1].trim()}` : "Unknown"
 
-          // NEW: Extract Token CA from the URL - last part after the last "/"
+          // NEW: Extract Token CA from the URL - handle different URL formats
           let tokenCA = "Unknown"
-          const urlMatch = message.content.match(/https:\/\/app\.assetdash\.com\/solana\/([A-Za-z0-9]+)/i)
+          const urlMatch = message.content.match(/https?:\/\/[^\s]*\/([A-Za-z0-9]+)(?:\s|$)/i)
           if (urlMatch) {
             tokenCA = urlMatch[1]
+          } else {
+            // If no URL found, generate a placeholder
+            tokenCA = `${token}_CA`
           }
 
           // Double-check that we have all required data
