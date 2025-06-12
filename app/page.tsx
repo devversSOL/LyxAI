@@ -16,10 +16,16 @@ import { Button } from "@/components/ui/button"
 import { Twitter, Github, Menu, X, RefreshCw } from "lucide-react"
 import AnimatedTitle from "@/components/animated-title"
 
-// Dynamically import the 3D background to avoid SSR issues
+// Dynamically import the 3D background with loading optimization
 const BackgroundScene = dynamic(() => import("@/components/background-scene"), {
   ssr: false,
-  loading: () => <div className="fixed inset-0 z-0 opacity-80 bg-black"></div>,
+  loading: () => (
+    <div className="fixed inset-0 z-0 opacity-80">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-purple-800/20" />
+      <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px]" />
+      <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-purple-700/5 rounded-full blur-[120px]" />
+    </div>
+  ),
 })
 
 interface TrendingCoin {
@@ -46,11 +52,21 @@ export default function Home() {
   const [isLoadingTrending, setIsLoadingTrending] = useState(true)
   const [trendingError, setTrendingError] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [enable3D, setEnable3D] = useState(true)
 
   const setIsContractAnalyzerOpen = useState(false)[1]
 
   useEffect(() => {
     setMounted(true)
+
+    // Detect if device might struggle with 3D
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    const isLowEnd = navigator.hardwareConcurrency <= 4
+
+    if (isMobile && isLowEnd) {
+      // Delay 3D loading on low-end mobile devices
+      setTimeout(() => setEnable3D(true), 1000)
+    }
   }, [])
 
   useEffect(() => {
@@ -147,7 +163,7 @@ export default function Home() {
 
   return (
     <div className="bg-black text-white overflow-hidden relative font-extralight h-screen">
-      {/* Background effects */}
+      {/* Background effects - optimized loading */}
       {mounted && (
         <>
           <LightningEffect />
@@ -168,7 +184,15 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="relative h-screen flex flex-col">
-        {mounted ? <BackgroundScene /> : <div className="fixed inset-0 z-0 opacity-80 bg-black"></div>}
+        {mounted && enable3D ? (
+          <BackgroundScene />
+        ) : (
+          <div className="fixed inset-0 z-0 opacity-80">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-purple-800/20" />
+            <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px]" />
+            <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-purple-700/5 rounded-full blur-[120px]" />
+          </div>
+        )}
 
         {/* Main content */}
         <div className="relative z-10 flex flex-col h-full">
