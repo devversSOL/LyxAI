@@ -17,7 +17,10 @@ import { Twitter, Github, Menu, X, RefreshCw } from "lucide-react"
 import AnimatedTitle from "@/components/animated-title"
 
 // Dynamically import the 3D background to avoid SSR issues
-const BackgroundScene = dynamic(() => import("@/components/background-scene"), { ssr: false })
+const BackgroundScene = dynamic(() => import("@/components/background-scene"), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 z-0 opacity-80 bg-black"></div>,
+})
 
 interface TrendingCoin {
   name: string
@@ -165,7 +168,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="relative h-screen flex flex-col">
-        {mounted && <BackgroundScene />}
+        {mounted ? <BackgroundScene /> : <div className="fixed inset-0 z-0 opacity-80 bg-black"></div>}
 
         {/* Main content */}
         <div className="relative z-10 flex flex-col h-full">
