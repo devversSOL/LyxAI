@@ -1,46 +1,28 @@
-# Awesome Crypto Project
+# 🚀 LyxAI Documentation - UPDATED VERSION 93
 
-This project provides tools and resources for analyzing and interacting with the cryptocurrency ecosystem.
+**THIS IS A TEST UPDATE - If you see this, the documentation updates are working!**
 
-## Features
+Welcome to the comprehensive LyxAI documentation. LyxAI is a Solana-focused crypto intelligence platform.
 
-- Token Analysis: Analyze token metrics, price history, and market capitalization.
-- Chat Assistant: Get real-time answers to your crypto questions.
-- Blockchain Visualization: Explore blockchain data and transactions.
-- New Feature: Advanced Trading Strategies: Implement and test various trading algorithms.
+## 📚 Documentation Sections
 
-## Getting Started
+### Getting Started
+- [User Interface Guide](getting-started/user-interface.md) - Navigate the LyxAI platform
 
-1.  Clone the repository:
+### Platform Overview  
+- [Platform Overview](overview/platform-overview.md) - Complete platform architecture and features
 
-    \`\`\`bash
-    git clone https://github.com/your-username/awesome-crypto-project.git
-    \`\`\`
+### Technical Documentation
+- [API Reference](technical/api-reference.md) - Complete API documentation
+- [Architecture](technical/architecture.md) - Technical system architecture
 
-2.  Install dependencies:
+### Resources
+- [FAQ](resources/faq.md) - Frequently asked questions
+- [Release Notes](resources/release-notes.md) - Latest updates and features
 
-    \`\`\`bash
-    npm install
-    \`\`\`
+## 🔍 Quick Links
 
-3.  Run the application:
-
-    \`\`\`bash
-    npm start
-    \`\`\`
-
-4.  Set up your environment:
-
-    \`\`\`bash
-    cp .env.example .env
-    \`\`\`
-
-    Edit the `.env` file with your configuration settings.
-
-## Contributing
-
-We welcome contributions to this project! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more information.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+- **Whale Tracker**: Real-time Solana whale activity monitoring
+- **Token Analyzer**: AI-powered Solana token analysis
+- **Wallet Analyzer**: Solana wallet address ai analysis(wr, roi, total pnl)
+- **API Access**: Comprehensive REST API for developers
