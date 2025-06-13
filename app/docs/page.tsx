@@ -13,7 +13,6 @@ const docsByCategory = {
     { slug: "features/narrative-analysis", title: "Narrative Analysis" },
   ],
   technical: [{ slug: "technical/architecture", title: "System Architecture" }],
-  // Removed resources category entirely
 }
 
 export default function DocsPage() {
@@ -49,6 +48,7 @@ export default function DocsPage() {
                     <Link
                       href={`/docs/${doc.slug}`}
                       className="block px-3 py-2 rounded-md hover:bg-zinc-800/50 text-sm"
+                      prefetch={false} // Disable prefetching to prevent excessive navigation
                     >
                       {doc.title}
                     </Link>
@@ -101,6 +101,7 @@ export default function DocsPage() {
                       <Link
                         href={`/docs/${doc.slug}`}
                         className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors"
+                        prefetch={false} // Disable prefetching to prevent excessive navigation
                       >
                         <FileText size={16} />
                         {doc.title}

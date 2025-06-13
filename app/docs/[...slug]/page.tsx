@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation"
-import { getAllDocs } from "@/lib/docs"
+import { notFound } from "next/navigation"
+import { getAllDocs, getDocBySlug } from "@/lib/docs"
+import { DocPageTemplate } from "@/components/doc-page-template"
 
 interface DocPageProps {
   params: {
@@ -17,8 +18,12 @@ export async function generateStaticParams() {
 export default async function DocPage({ params }: DocPageProps) {
   const slug = params.slug?.join("/") || ""
 
-  // Redirect to the new TSX-based documentation pages
-  redirect(`/docs/${slug}`)
+  // Instead of redirecting, let's try to fetch and render the doc
+  const doc = await getDocBySlug(slug)
 
-  // The rest of the code is not needed after the redirect
+  if (!doc) {
+    notFound()
+  }
+
+  return <DocPageTemplate doc={doc} />
 }

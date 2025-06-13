@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 
+// Add this line to force dynamic rendering
+export const dynamic = "force-dynamic"
+
 // Function to check if an address is a wallet or token using Helius API
 async function checkAddressTypeWithHelius(address: string): Promise<{ isWallet: boolean; isToken: boolean }> {
   try {

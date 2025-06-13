@@ -7,7 +7,8 @@ interface DocPageTemplateProps {
   children: React.ReactNode
 }
 
-export default function DocPageTemplate({ title, children }: DocPageTemplateProps) {
+// Create the component function
+export function DocPageTemplate({ title, children }: DocPageTemplateProps) {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -36,3 +37,6 @@ export default function DocPageTemplate({ title, children }: DocPageTemplateProp
     </div>
   )
 }
+
+// Also export as default for backward compatibility
+export default DocPageTemplate

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server"
 
+// Add this line to force dynamic rendering
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   const channelId = process.env.DISCORD_WHALE_CHANNEL_ID
   const token = process.env.DISCORD_BOT_TOKEN
