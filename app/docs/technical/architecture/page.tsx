@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { ChevronRight, Home } from "lucide-react"
+import Image from "next/image"
 
 export default function ArchitecturePage() {
   return (
@@ -39,91 +40,53 @@ export default function ArchitecturePage() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Component Architecture</h2>
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-            <div className="text-center text-zinc-300 mb-4">Component Architecture</div>
-
-            <div className="grid grid-cols-1 gap-6">
-              {/* User Interface Layer */}
-              <div className="border border-purple-700 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-2 text-purple-400">User Interface</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Chat Interface</div>
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Whale Tracker</div>
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Contract Analyzer</div>
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Saved Wallets</div>
-                </div>
-              </div>
-
-              {/* State Management Layer */}
-              <div className="border border-blue-700 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-2 text-blue-400">State Management</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">React State</div>
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Real-time Updates</div>
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Performance Monitor</div>
-                </div>
-              </div>
-
-              {/* API Services Layer */}
-              <div className="border border-green-700 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-2 text-green-400">API Services</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Analysis Service</div>
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Whale Service</div>
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Chat Service</div>
-                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Wallet Service</div>
-                </div>
-              </div>
+            <div className="flex justify-center">
+              <Image
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-06-13%20at%2019.30.13-q3mzgpTU9HfUSyjIF7k4dqQUu76Ub1.png"
+                alt="LyxAI System Architecture Diagram showing User Interface components (Chat Interface, Whale Tracker, Contract Analyzer, Saved Wallets) connecting to State Management (React State, Real-time Updates, Performance Monitor) which connects to API Services (Analysis Service, Whale Service, Chat Service, Wallet Service)"
+                width={800}
+                height={600}
+                className="rounded-lg"
+                priority
+              />
             </div>
           </div>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Data Flow Architecture</h2>
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-            <div className="text-center text-zinc-300 mb-4">Data Flow</div>
-
-            <div className="space-y-4">
-              <div className="flex flex-col items-center">
-                <div className="bg-zinc-800 p-2 rounded w-40 text-center">User Input</div>
-                <div className="h-6 border-l border-zinc-500"></div>
-                <div className="bg-zinc-800 p-2 rounded w-40 text-center">Input Validation</div>
-                <div className="h-6 border-l border-zinc-500"></div>
-                <div className="bg-zinc-800 p-2 rounded w-40 text-center">Address Type Detection</div>
-                <div className="h-6 border-l border-zinc-500"></div>
-                <div className="bg-purple-900/50 p-2 rounded w-40 text-center">Token or Wallet?</div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Token Flow */}
-                <div className="flex flex-col items-center">
-                  <div className="text-sm text-zinc-400 mb-2">Token Flow</div>
-                  <div className="bg-zinc-800 p-2 rounded w-40 text-center">Database Check</div>
-                  <div className="h-6 border-l border-zinc-500"></div>
-                  <div className="bg-purple-900/50 p-2 rounded w-40 text-center">Found in DB?</div>
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <div className="flex flex-col items-center">
-                      <div className="text-xs text-zinc-400">Yes</div>
-                      <div className="h-6 border-l border-zinc-500"></div>
-                      <div className="bg-zinc-800 p-2 rounded w-32 text-center text-sm">Return Cached</div>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div className="text-xs text-zinc-400">No</div>
-                      <div className="h-6 border-l border-zinc-500"></div>
-                      <div className="bg-zinc-800 p-2 rounded w-32 text-center text-sm">External APIs</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Wallet Flow */}
-                <div className="flex flex-col items-center">
-                  <div className="text-sm text-zinc-400 mb-2">Wallet Flow</div>
-                  <div className="bg-zinc-800 p-2 rounded w-40 text-center">Wallet Analysis</div>
-                  <div className="h-6 border-l border-zinc-500"></div>
-                  <div className="bg-zinc-800 p-2 rounded w-40 text-center">Data Processing</div>
-                  <div className="h-6 border-l border-zinc-500"></div>
-                  <div className="bg-green-900/50 p-2 rounded w-40 text-center">Return Results</div>
-                </div>
-              </div>
+            <div className="flex justify-center">
+              <Image
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-OGLmNnp2IPecuAO3ZbeCrz2K53tGaY.png"
+                alt="LyxAI Data Flow Architecture Diagram showing the complete process flow from User Input through Input Validation, Address Type Detection, branching to Token or Wallet paths, with Token path going through Database Check, External API Calls (DexScreener, Birdeye, Solscan), Data Aggregation, AI Processing, Risk Assessment, Store in Database, and Return Results. Wallet path goes through Wallet Analysis and Wallet Data Processing to Return Results."
+                width={800}
+                height={1200}
+                className="rounded-lg"
+                priority
+              />
             </div>
           </div>
+
+          <p className="text-zinc-300 mb-6">The data flow follows these key processes:</p>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3 text-purple-400">Token Analysis Flow</h3>
+          <ol className="list-decimal pl-6 mb-4 text-zinc-300">
+            <li>User input is validated and address type is detected</li>
+            <li>System checks if token data exists in database</li>
+            <li>If cached data exists, return immediately</li>
+            <li>If not cached, make external API calls to DexScreener, Birdeye, and Solscan</li>
+            <li>Aggregate data from all sources</li>
+            <li>Process through AI for analysis and risk assessment</li>
+            <li>Store results in database for future use</li>
+            <li>Return comprehensive analysis to user</li>
+          </ol>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3 text-blue-400">Wallet Analysis Flow</h3>
+          <ol className="list-decimal pl-6 mb-6 text-zinc-300">
+            <li>User input is validated and identified as wallet address</li>
+            <li>Direct wallet analysis is performed</li>
+            <li>Wallet data is processed and analyzed</li>
+            <li>Results are returned to user</li>
+          </ol>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Technology Stack</h2>
           <ul className="list-disc pl-6 mb-6 text-zinc-300">
@@ -156,7 +119,7 @@ export default function ArchitecturePage() {
           </ul>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Scalability</h2>
-          <p className="text-zinc-300">
+          <p className="text-zinc-300 mb-6">
             The architecture is designed to scale horizontally, with stateless components that can be replicated as
             needed. The use of serverless functions allows for automatic scaling based on demand.
           </p>
