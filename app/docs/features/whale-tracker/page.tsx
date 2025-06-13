@@ -1,39 +1,7 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronRight, Home } from "lucide-react"
-import SimpleMermaid from "@/components/simple-mermaid"
 
 export default function WhaleTrackerPage() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-black text-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
-            <Link href="/docs" className="hover:text-white">
-              Documentation
-            </Link>
-            <ChevronRight size={14} />
-            <span className="text-white">Whale Tracker</span>
-          </div>
-          <h1 className="text-4xl font-bold mb-6">Whale Tracker</h1>
-          <div className="animate-pulse">
-            <div className="h-4 bg-zinc-800 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-zinc-800 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-zinc-800 rounded w-5/6 mb-4"></div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -54,10 +22,9 @@ export default function WhaleTrackerPage() {
           <span className="text-white">Whale Tracker</span>
         </div>
 
-        {/* Content */}
-        <div className="prose prose-invert max-w-none">
-          <h1 className="text-4xl font-bold mb-6">🐋 Whale Activity Tracker</h1>
+        <h1 className="text-4xl font-bold mb-6">🐋 Whale Activity Tracker</h1>
 
+        <div className="prose prose-invert max-w-none">
           <p className="text-xl text-zinc-300 mb-8">
             The Whale Activity Tracker is LyxAI's flagship feature for monitoring large Solana transactions and whale
             movements in real-time.
@@ -65,33 +32,35 @@ export default function WhaleTrackerPage() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Process Overview</h2>
 
-          <SimpleMermaid
-            chart={`
-graph TB
-   A["Discord Channels"] --> B["Webhook Receiver"]
-   B --> C["Message Parser"]
-   C --> D["Whale Detection"]
-   D --> E{"Valid Whale Alert?"}
-   
-   E -->|Yes| F["Extract Token Info"]
-   E -->|No| G["Discard Message"]
-   
-   F --> H["Fetch Token Data"]
-   H --> I["DexScreener API"]
-   H --> J["Birdeye API"]
-   
-   I --> K["Data Aggregation"]
-   J --> K
-   
-   K --> L["Store in Database"]
-   L --> M["Real-time UI Update"]
-   M --> N["User Dashboard"]
-   
-   O["User Filters"] --> P["Token Selection"]
-   P --> Q["Filter Results"]
-   Q --> N
-`}
-          />
+          <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
+            <div className="text-center text-zinc-300 mb-4">Whale Tracking Process Flow</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-zinc-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Data Collection</h3>
+                <ul className="list-disc pl-4 text-sm text-zinc-300">
+                  <li>Discord Channels</li>
+                  <li>Webhook Receiver</li>
+                  <li>Message Parser</li>
+                </ul>
+              </div>
+              <div className="bg-zinc-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Processing</h3>
+                <ul className="list-disc pl-4 text-sm text-zinc-300">
+                  <li>Whale Detection</li>
+                  <li>Token Info Extraction</li>
+                  <li>External API Calls</li>
+                </ul>
+              </div>
+              <div className="bg-zinc-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">Presentation</h3>
+                <ul className="list-disc pl-4 text-sm text-zinc-300">
+                  <li>Data Aggregation</li>
+                  <li>Database Storage</li>
+                  <li>Real-time UI Updates</li>
+                </ul>
+              </div>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Key Features</h2>
           <ul className="list-disc pl-6 mb-6 text-zinc-300">
@@ -122,26 +91,36 @@ graph TB
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Implementation Details</h2>
 
-          <SimpleMermaid
-            chart={`
-sequenceDiagram
-   participant Discord as Discord Bot
-   participant Webhook as Webhook Receiver
-   participant Parser as Message Parser
-   participant API as External APIs
-   participant DB as Database
-   participant UI as User Interface
-   
-   Discord->>Webhook: Send Whale Alert
-   Webhook->>Parser: Process Message
-   Parser->>Parser: Extract Token Info
-   Parser->>API: Fetch Token Data
-   API-->>Parser: Return Token Data
-   Parser->>DB: Store Transaction
-   DB-->>UI: Update Dashboard
-   UI->>UI: Notify User
-`}
-          />
+          <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
+            <div className="text-center text-zinc-300 mb-4">Whale Alert Processing Sequence</div>
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <div className="w-1/3 text-right pr-4 text-zinc-400">Discord Bot</div>
+                <div className="w-1/3 border-t border-purple-500"></div>
+                <div className="w-1/3 pl-4">Webhook Receiver</div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-1/3 text-right pr-4 text-zinc-400">Webhook Receiver</div>
+                <div className="w-1/3 border-t border-purple-500"></div>
+                <div className="w-1/3 pl-4">Message Parser</div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-1/3 text-right pr-4 text-zinc-400">Message Parser</div>
+                <div className="w-1/3 border-t border-purple-500"></div>
+                <div className="w-1/3 pl-4">External APIs</div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-1/3 text-right pr-4 text-zinc-400">External APIs</div>
+                <div className="w-1/3 border-t border-purple-500"></div>
+                <div className="w-1/3 pl-4">Database</div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-1/3 text-right pr-4 text-zinc-400">Database</div>
+                <div className="w-1/3 border-t border-purple-500"></div>
+                <div className="w-1/3 pl-4">User Interface</div>
+              </div>
+            </div>
+          </div>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Use Cases</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">

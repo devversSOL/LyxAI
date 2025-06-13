@@ -1,39 +1,7 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronRight, Home } from "lucide-react"
-import SimpleMermaid from "@/components/simple-mermaid"
 
 export default function ArchitecturePage() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-black text-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
-            <Link href="/docs" className="hover:text-white">
-              Documentation
-            </Link>
-            <ChevronRight size={14} />
-            <span className="text-white">System Architecture</span>
-          </div>
-          <h1 className="text-4xl font-bold mb-6">System Architecture</h1>
-          <div className="animate-pulse">
-            <div className="h-4 bg-zinc-800 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-zinc-800 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-zinc-800 rounded w-5/6 mb-4"></div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -71,77 +39,90 @@ export default function ArchitecturePage() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Component Architecture</h2>
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-            <SimpleMermaid
-              chart={`
-graph LR
-    subgraph "User Interface"
-        A["Chat Interface"]
-        B["Whale Tracker"]
-        C["Contract Analyzer"]
-        D["Saved Wallets"]
-    end
-    
-    subgraph "State Management"
-        E["React State"]
-        F["Real-time Updates"]
-        G["Performance Monitor"]
-    end
-    
-    subgraph "API Services"
-        H["Analysis Service"]
-        I["Whale Service"]
-        J["Chat Service"]
-        K["Wallet Service"]
-    end
-    
-    A --> E
-    B --> E
-    C --> E
-    D --> E
-    E --> H
-    E --> I
-    E --> J
-    E --> K
-    F --> E
-    G --> E
-`}
-            />
+            <div className="text-center text-zinc-300 mb-4">Component Architecture</div>
+
+            <div className="grid grid-cols-1 gap-6">
+              {/* User Interface Layer */}
+              <div className="border border-purple-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-2 text-purple-400">User Interface</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Chat Interface</div>
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Whale Tracker</div>
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Contract Analyzer</div>
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Saved Wallets</div>
+                </div>
+              </div>
+
+              {/* State Management Layer */}
+              <div className="border border-blue-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-2 text-blue-400">State Management</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">React State</div>
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Real-time Updates</div>
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Performance Monitor</div>
+                </div>
+              </div>
+
+              {/* API Services Layer */}
+              <div className="border border-green-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-2 text-green-400">API Services</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Analysis Service</div>
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Whale Service</div>
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Chat Service</div>
+                  <div className="bg-zinc-800 p-2 rounded text-center text-sm">Wallet Service</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Data Flow Architecture</h2>
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-            <SimpleMermaid
-              chart={`
-graph TD
-    A["User Input"] --> B["Input Validation"]
-    B --> C["Address Type Detection"]
-    C --> D{"Token or Wallet?"}
-    
-    D -->|Token| E["Database Check"]
-    D -->|Wallet| F["Wallet Analysis"]
-    
-    E --> G{"Found in DB?"}
-    G -->|Yes| H["Return Cached Analysis"]
-    G -->|No| I["External API Calls"]
-    
-    I --> J["DexScreener API"]
-    I --> K["Birdeye API"]
-    I --> L["Solscan API"]
-    
-    J --> M["Data Aggregation"]
-    K --> M
-    L --> M
-    
-    M --> N["AI Processing"]
-    N --> O["Risk Assessment"]
-    O --> P["Store in Database"]
-    P --> Q["Return Results"]
-    
-    F --> R["Wallet Data Processing"]
-    R --> Q
-    H --> Q
-`}
-            />
+            <div className="text-center text-zinc-300 mb-4">Data Flow</div>
+
+            <div className="space-y-4">
+              <div className="flex flex-col items-center">
+                <div className="bg-zinc-800 p-2 rounded w-40 text-center">User Input</div>
+                <div className="h-6 border-l border-zinc-500"></div>
+                <div className="bg-zinc-800 p-2 rounded w-40 text-center">Input Validation</div>
+                <div className="h-6 border-l border-zinc-500"></div>
+                <div className="bg-zinc-800 p-2 rounded w-40 text-center">Address Type Detection</div>
+                <div className="h-6 border-l border-zinc-500"></div>
+                <div className="bg-purple-900/50 p-2 rounded w-40 text-center">Token or Wallet?</div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Token Flow */}
+                <div className="flex flex-col items-center">
+                  <div className="text-sm text-zinc-400 mb-2">Token Flow</div>
+                  <div className="bg-zinc-800 p-2 rounded w-40 text-center">Database Check</div>
+                  <div className="h-6 border-l border-zinc-500"></div>
+                  <div className="bg-purple-900/50 p-2 rounded w-40 text-center">Found in DB?</div>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="flex flex-col items-center">
+                      <div className="text-xs text-zinc-400">Yes</div>
+                      <div className="h-6 border-l border-zinc-500"></div>
+                      <div className="bg-zinc-800 p-2 rounded w-32 text-center text-sm">Return Cached</div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <div className="text-xs text-zinc-400">No</div>
+                      <div className="h-6 border-l border-zinc-500"></div>
+                      <div className="bg-zinc-800 p-2 rounded w-32 text-center text-sm">External APIs</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Wallet Flow */}
+                <div className="flex flex-col items-center">
+                  <div className="text-sm text-zinc-400 mb-2">Wallet Flow</div>
+                  <div className="bg-zinc-800 p-2 rounded w-40 text-center">Wallet Analysis</div>
+                  <div className="h-6 border-l border-zinc-500"></div>
+                  <div className="bg-zinc-800 p-2 rounded w-40 text-center">Data Processing</div>
+                  <div className="h-6 border-l border-zinc-500"></div>
+                  <div className="bg-green-900/50 p-2 rounded w-40 text-center">Return Results</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Technology Stack</h2>
