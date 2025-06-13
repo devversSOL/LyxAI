@@ -18,43 +18,42 @@ export interface DocFile {
 
 export async function getDocBySlug(slug: string): Promise<DocFile | null> {
   try {
-    // Check if the file exists with .md extension
-    let fullPath = path.join(docsDirectory, `${slug}.md`)
-
-    // If .md doesn't exist, try .mdx
+    const fullPath = path.join(docsDirectory, `${slug}.md`)
+    
     if (!fs.existsSync(fullPath)) {
-      fullPath = path.join(docsDirectory, `${slug}.mdx`)
-
-      // If neither exists, return null
-      if (!fs.existsSync(fullPath)) {
-        return null
-      }
+      return null
     }
-
+    
     const fileContents = fs.readFileSync(fullPath, "utf8")
     const { data, content } = matter(fileContents)
 
     // Check if content has Mermaid diagrams
-    const hasMermaid = content.includes("```mermaid")
+    const hasMermaid = content.includes('```mermaid')
 
     // Process Mermaid diagrams - convert to component syntax for client-side rendering
-    const processedContent = content.replace(/```mermaid\n([\s\S]*?)\n```/g, (match, chart) => {
-      const chartId = Math.random().toString(36).substr(2, 9)
-      return `<div class="mermaid-wrapper" data-chart-id="${chartId}">
+    let processedContent = content.replace(
+      /```mermaid\n([\s\S]*?)\n```/g,
+      (match, chart) => {
+        const chartId = Math.random().toString(36).substr(2, 9)
+        return `<div class="mermaid-wrapper" data-chart-id="${chartId}">
           <div class="mermaid-chart">${chart.trim()}</div>
         </div>`
-    })
+      }
+    )
 
-    const processedMarkdown = await remark().use(remarkGfm).use(html, { sanitize: false }).process(processedContent)
+    const processedMarkdown = await remark()
+      .use(remarkGfm)
+      .use(html, { sanitize: false })
+      .process(processedContent)
 
     const contentHtml = processedMarkdown.toString()
 
     return {
       slug,
-      title: data.title || slug.split("/").pop() || "Untitled",
+      title: data.title || slug.split('/').pop() || 'Untitled',
       content: contentHtml,
       excerpt: data.excerpt,
-      category: data.category || slug.split("/")[0] || "general",
+      category: data.category || slug.split('/')[0] || 'general',
       hasMermaid,
     }
   } catch (error) {
@@ -70,7 +69,7 @@ export function getAllDocs(): DocFile[] {
 
   const getAllMarkdownFiles = (dir: string, basePath = ""): DocFile[] => {
     const files: DocFile[] = []
-
+    
     try {
       const items = fs.readdirSync(dir)
 
@@ -80,20 +79,20 @@ export function getAllDocs(): DocFile[] {
 
         if (fs.statSync(fullPath).isDirectory()) {
           files.push(...getAllMarkdownFiles(fullPath, relativePath))
-        } else if (item.endsWith(".md") || item.endsWith(".mdx")) {
-          const slug = relativePath.replace(/\.(md|mdx)$/, "").replace(/\\/g, "/")
-
+        } else if (item.endsWith(".md")) {
+          const slug = relativePath.replace(/\.md$/, "").replace(/\\/g, "/")
+          
           try {
             const fileContents = fs.readFileSync(fullPath, "utf8")
             const { data, content } = matter(fileContents)
-            const hasMermaid = content.includes("```mermaid")
+            const hasMermaid = content.includes('```mermaid')
 
             files.push({
               slug,
-              title: data.title || slug.split("/").pop() || "Untitled",
+              title: data.title || slug.split('/').pop() || 'Untitled',
               content: "",
               excerpt: data.excerpt,
-              category: data.category || slug.split("/")[0] || "general",
+              category: data.category || slug.split('/')[0] || 'general',
               hasMermaid,
             })
           } catch (fileError) {
