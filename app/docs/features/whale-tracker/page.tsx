@@ -15,16 +15,15 @@ export default function WhaleTrackerPage() {
             Documentation
           </Link>
           <ChevronRight size={14} />
-          <Link href="/docs/features" className="hover:text-white">
-            Features
-          </Link>
+          <span className="text-zinc-400">Features</span>
           <ChevronRight size={14} />
           <span className="text-white">Whale Tracker</span>
         </div>
 
-        <h1 className="text-4xl font-bold mb-6">🐋 Whale Activity Tracker</h1>
-
+        {/* Content */}
         <div className="prose prose-invert max-w-none">
+          <h1 className="text-4xl font-bold mb-6">🐋 Whale Activity Tracker</h1>
+
           <p className="text-xl text-zinc-300 mb-8">
             The Whale Activity Tracker is LyxAI's flagship feature for monitoring large Solana transactions and whale
             movements in real-time.
@@ -83,7 +82,7 @@ export default function WhaleTrackerPage() {
           </ul>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">User Interface</h2>
-          <p className="text-zinc-300">
+          <p className="text-zinc-300 mb-6">
             The Whale Activity Tracker features a real-time dashboard with customizable filters, allowing users to focus
             on specific tokens, transaction sizes, or time periods. The interface includes visual indicators for
             transaction size and impact, as well as quick links to token analysis and historical data.
