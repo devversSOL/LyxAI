@@ -3,20 +3,36 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronRight, Home } from "lucide-react"
-import dynamic from "next/dynamic"
-
-// Dynamically import the mermaid component with SSR disabled
-const SimpleMermaid = dynamic(() => import("@/components/simple-mermaid"), {
-  ssr: false,
-  loading: () => <div className="p-4 bg-zinc-800/50 rounded-lg">Loading diagram...</div>,
-})
+import SimpleMermaid from "@/components/simple-mermaid"
 
 export default function WhaleTrackerPage() {
-  const [isClient, setIsClient] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setIsClient(true)
+    setMounted(true)
   }, [])
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
+            <Link href="/docs" className="hover:text-white">
+              Documentation
+            </Link>
+            <ChevronRight size={14} />
+            <span className="text-white">Whale Tracker</span>
+          </div>
+          <h1 className="text-4xl font-bold mb-6">Whale Tracker</h1>
+          <div className="animate-pulse">
+            <div className="h-4 bg-zinc-800 rounded w-3/4 mb-4"></div>
+            <div className="h-4 bg-zinc-800 rounded w-1/2 mb-4"></div>
+            <div className="h-4 bg-zinc-800 rounded w-5/6 mb-4"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -49,10 +65,8 @@ export default function WhaleTrackerPage() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Process Overview</h2>
 
-          {isClient && (
-            <SimpleMermaid
-              chart={`
-%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#a855f7', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7c3aed', 'lineColor': '#6366f1', 'secondaryColor': '#ec4899', 'tertiaryColor': '#10b981' }}}%%
+          <SimpleMermaid
+            chart={`
 graph TB
    A["Discord Channels"] --> B["Webhook Receiver"]
    B --> C["Message Parser"]
@@ -77,8 +91,7 @@ graph TB
    P --> Q["Filter Results"]
    Q --> N
 `}
-            />
-          )}
+          />
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Key Features</h2>
           <ul className="list-disc pl-6 mb-6 text-zinc-300">
@@ -109,10 +122,8 @@ graph TB
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Implementation Details</h2>
 
-          {isClient && (
-            <SimpleMermaid
-              chart={`
-%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#a855f7', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7c3aed', 'lineColor': '#6366f1', 'secondaryColor': '#ec4899', 'tertiaryColor': '#10b981' }}}%%
+          <SimpleMermaid
+            chart={`
 sequenceDiagram
    participant Discord as Discord Bot
    participant Webhook as Webhook Receiver
@@ -130,8 +141,7 @@ sequenceDiagram
    DB-->>UI: Update Dashboard
    UI->>UI: Notify User
 `}
-            />
-          )}
+          />
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Use Cases</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">

@@ -1,87 +1,107 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import mermaid from "mermaid"
+import { useEffect, useRef } from "react"
+import Script from "next/script"
 
 interface SimpleMermaidProps {
   chart: string
   className?: string
 }
 
-// Initialize mermaid with dark theme configuration
-if (typeof window !== "undefined") {
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: "dark",
-    securityLevel: "loose",
-    themeVariables: {
-      primaryColor: "#a855f7",
-      primaryTextColor: "#ffffff",
-      primaryBorderColor: "#7c3aed",
-      lineColor: "#6366f1",
-      secondaryColor: "#ec4899",
-      tertiaryColor: "#10b981",
-      background: "#18181b",
-      mainBkg: "#27272a",
-      nodeBorder: "#4c1d95",
-      clusterBkg: "#1e1b4b",
-      clusterBorder: "#4338ca",
-      titleColor: "#f5f5f5",
-      edgeLabelBackground: "#27272a",
-      textColor: "#f5f5f5",
-    },
-  })
-}
-
 export default function SimpleMermaid({ chart, className = "" }: SimpleMermaidProps) {
   const mermaidRef = useRef<HTMLDivElement>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [rendered, setRendered] = useState(false)
+  const uniqueId = `mermaid-${Math.random().toString(36).substring(2, 11)}`
 
   useEffect(() => {
+    // Check if we're in the browser
     if (typeof window === "undefined") return
 
-    const renderChart = async () => {
-      if (!mermaidRef.current) return
+    // Function to render the diagram
+    const renderDiagram = () => {
+      if (!mermaidRef.current || !window.mermaid) return
 
       try {
-        mermaidRef.current.innerHTML = chart
-        await mermaid.run({
-          nodes: [mermaidRef.current],
+        // Clear previous content
+        mermaidRef.current.innerHTML = `<div class="mermaid" id="${uniqueId}">${chart}</div>`
+
+        // Initialize mermaid with dark theme
+        window.mermaid.initialize({
+          startOnLoad: true,
+          theme: "dark",
+          securityLevel: "loose",
+          fontFamily: "inherit",
+          themeVariables: {
+            primaryColor: "#a855f7",
+            primaryTextColor: "#ffffff",
+            primaryBorderColor: "#7c3aed",
+            lineColor: "#6366f1",
+            secondaryColor: "#ec4899",
+            tertiaryColor: "#10b981",
+            background: "#18181b",
+            mainBkg: "#27272a",
+            nodeBorder: "#4c1d95",
+            clusterBkg: "#1e1b4b",
+            clusterBorder: "#4338ca",
+            titleColor: "#f5f5f5",
+            edgeLabelBackground: "#27272a",
+            textColor: "#f5f5f5",
+          },
         })
-        setRendered(true)
-      } catch (err) {
-        console.error("Mermaid rendering error:", err)
-        setError("Failed to render diagram. Please check the syntax.")
+
+        // Render the diagram
+        window.mermaid.run()
+      } catch (error) {
+        console.error("Mermaid rendering error:", error)
+        if (mermaidRef.current) {
+          mermaidRef.current.innerHTML = `
+            <div class="p-4 bg-red-900/20 border border-red-500 rounded-md">
+              <p class="text-red-400">Error rendering diagram: ${error instanceof Error ? error.message : String(error)}</p>
+            </div>
+          `
+        }
       }
     }
 
-    // Small delay to ensure the component is fully mounted
-    const timer = setTimeout(() => {
-      renderChart()
-    }, 100)
+    // If mermaid is already loaded, render immediately
+    if (window.mermaid) {
+      renderDiagram()
+    } else {
+      // Otherwise wait for the script to load
+      window.addEventListener("mermaid-loaded", renderDiagram)
+    }
 
-    return () => clearTimeout(timer)
-  }, [chart])
-
-  if (error) {
-    return (
-      <div className="p-4 bg-red-900/20 border border-red-700 rounded-lg text-red-200">
-        <p className="font-medium">Error rendering diagram:</p>
-        <p className="text-sm mt-1">{error}</p>
-        <pre className="mt-2 p-2 bg-black/30 rounded text-xs overflow-x-auto">{chart}</pre>
-      </div>
-    )
-  }
+    return () => {
+      window.removeEventListener("mermaid-loaded", renderDiagram)
+    }
+  }, [chart, uniqueId])
 
   return (
-    <div
-      className={`mermaid-wrapper ${className} ${rendered ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
-    >
-      <div ref={mermaidRef} className="mermaid bg-zinc-900/30 p-4 rounded-lg overflow-x-auto"></div>
-    </div>
+    <>
+      {/* Load mermaid script if not already loaded */}
+      {typeof window !== "undefined" && !window.mermaid && (
+        <Script
+          src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"
+          strategy="afterInteractive"
+          onLoad={() => {
+            window.dispatchEvent(new Event("mermaid-loaded"))
+          }}
+        />
+      )}
+      <div className={`my-6 p-4 bg-zinc-800/50 rounded-lg overflow-x-auto ${className}`}>
+        <div ref={mermaidRef} className="w-full min-h-[100px] flex items-center justify-center">
+          <div className="animate-pulse text-zinc-400">Loading diagram...</div>
+        </div>
+      </div>
+    </>
   )
 }
 
-// Also export as named export for flexibility
+// Also export as named export
 export { SimpleMermaid }
+
+// Add mermaid to the window object type
+declare global {
+  interface Window {
+    mermaid: any
+  }
+}

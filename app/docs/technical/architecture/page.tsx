@@ -3,20 +3,36 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronRight, Home } from "lucide-react"
-import dynamic from "next/dynamic"
-
-// Dynamically import the mermaid component with SSR disabled
-const SimpleMermaid = dynamic(() => import("@/components/simple-mermaid"), {
-  ssr: false,
-  loading: () => <div className="p-4 bg-zinc-800/50 rounded-lg">Loading diagram...</div>,
-})
+import SimpleMermaid from "@/components/simple-mermaid"
 
 export default function ArchitecturePage() {
-  const [isClient, setIsClient] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setIsClient(true)
+    setMounted(true)
   }, [])
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
+            <Link href="/docs" className="hover:text-white">
+              Documentation
+            </Link>
+            <ChevronRight size={14} />
+            <span className="text-white">System Architecture</span>
+          </div>
+          <h1 className="text-4xl font-bold mb-6">System Architecture</h1>
+          <div className="animate-pulse">
+            <div className="h-4 bg-zinc-800 rounded w-3/4 mb-4"></div>
+            <div className="h-4 bg-zinc-800 rounded w-1/2 mb-4"></div>
+            <div className="h-4 bg-zinc-800 rounded w-5/6 mb-4"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -55,9 +71,8 @@ export default function ArchitecturePage() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Component Architecture</h2>
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-            {isClient && (
-              <SimpleMermaid
-                chart={`
+            <SimpleMermaid
+              chart={`
 graph LR
     subgraph "User Interface"
         A["Chat Interface"]
@@ -90,15 +105,13 @@ graph LR
     F --> E
     G --> E
 `}
-              />
-            )}
+            />
           </div>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Data Flow Architecture</h2>
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-            {isClient && (
-              <SimpleMermaid
-                chart={`
+            <SimpleMermaid
+              chart={`
 graph TD
     A["User Input"] --> B["Input Validation"]
     B --> C["Address Type Detection"]
@@ -128,8 +141,7 @@ graph TD
     R --> Q
     H --> Q
 `}
-              />
-            )}
+            />
           </div>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Technology Stack</h2>
