@@ -18,9 +18,8 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: ['mermaid'],
-  },
+  // Fixed: moved from experimental.serverComponentsExternalPackages to serverExternalPackages
+  serverExternalPackages: ['mermaid'],
 }
 
 export default nextConfig
