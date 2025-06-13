@@ -2,11 +2,6 @@
 
 import Link from "next/link"
 import { ChevronRight, Home } from "lucide-react"
-import {
-  WhaleTrackerDataFlow,
-  TokenFilteringProcess,
-  RealTimeUpdateMechanism,
-} from "@/components/diagrams/whale-tracker-diagrams"
 
 export default function WhaleTrackerDocs() {
   return (
@@ -48,7 +43,7 @@ export default function WhaleTrackerDocs() {
 
           <h2 className="text-2xl font-bold mb-4">Process Flows</h2>
 
-          <WhaleTrackerDataFlow />
+          <div>Hello World</div>
 
           <h3 className="text-xl font-semibold mb-4">Key Features</h3>
           <ul className="text-zinc-300 space-y-2 mb-6">
@@ -69,7 +64,7 @@ export default function WhaleTrackerDocs() {
             </li>
           </ul>
 
-          <TokenFilteringProcess />
+          <div>Hello World</div>
 
           <h3 className="text-xl font-semibold mb-4">Real-time Architecture</h3>
           <p className="text-zinc-300 mb-6">
@@ -77,7 +72,7 @@ export default function WhaleTrackerDocs() {
             providing instant notifications and updates across all connected clients.
           </p>
 
-          <RealTimeUpdateMechanism />
+          <div>Hello World</div>
 
           <h3 className="text-xl font-semibold mb-4">Data Sources</h3>
           <ul className="text-zinc-300 space-y-2 mb-6">
