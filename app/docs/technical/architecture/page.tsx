@@ -1,26 +1,63 @@
 "use client"
-import DocPageTemplate from "@/components/doc-page-template"
-import SimpleMermaid from "@/components/simple-mermaid"
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { ChevronRight, Home } from "lucide-react"
+import dynamic from "next/dynamic"
+
+// Dynamically import the mermaid component with SSR disabled
+const SimpleMermaid = dynamic(() => import("@/components/simple-mermaid"), {
+  ssr: false,
+  loading: () => <div className="p-4 bg-zinc-800/50 rounded-lg">Loading diagram...</div>,
+})
 
 export default function ArchitecturePage() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   return (
-    <DocPageTemplate title="System Architecture">
-      <p className="text-zinc-300 mb-6">
-        This document provides an overview of the LyxAI platform architecture, including the key components, data flow,
-        and integration points.
-      </p>
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
+          <Link href="/" className="hover:text-white">
+            <Home size={16} />
+          </Link>
+          <ChevronRight size={14} />
+          <Link href="/docs" className="hover:text-white">
+            Documentation
+          </Link>
+          <ChevronRight size={14} />
+          <Link href="/docs/technical" className="hover:text-white">
+            Technical
+          </Link>
+          <ChevronRight size={14} />
+          <span className="text-white">System Architecture</span>
+        </div>
 
-      <h2 className="text-2xl font-bold mt-8 mb-4">Overview</h2>
-      <p className="text-zinc-300 mb-6">
-        LyxAI is built as a modern web application using Next.js, with a focus on real-time data processing and
-        AI-powered analysis. The system integrates with multiple blockchain data sources and provides users with
-        actionable insights.
-      </p>
+        <h1 className="text-4xl font-bold mb-6">System Architecture</h1>
 
-      <h2 className="text-2xl font-bold mt-8 mb-4">Component Architecture</h2>
-      <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-        <SimpleMermaid
-          chart={`
+        <div className="prose prose-invert max-w-none">
+          <p className="text-zinc-300 mb-6">
+            This document provides an overview of the LyxAI platform architecture, including the key components, data
+            flow, and integration points.
+          </p>
+
+          <h2 className="text-2xl font-bold mt-8 mb-4">Overview</h2>
+          <p className="text-zinc-300 mb-6">
+            LyxAI is built as a modern web application using Next.js, with a focus on real-time data processing and
+            AI-powered analysis. The system integrates with multiple blockchain data sources and provides users with
+            actionable insights.
+          </p>
+
+          <h2 className="text-2xl font-bold mt-8 mb-4">Component Architecture</h2>
+          <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
+            {isClient && (
+              <SimpleMermaid
+                chart={`
 graph LR
     subgraph "User Interface"
         A["Chat Interface"]
@@ -53,13 +90,15 @@ graph LR
     F --> E
     G --> E
 `}
-        />
-      </div>
+              />
+            )}
+          </div>
 
-      <h2 className="text-2xl font-bold mt-8 mb-4">Data Flow Architecture</h2>
-      <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-        <SimpleMermaid
-          chart={`
+          <h2 className="text-2xl font-bold mt-8 mb-4">Data Flow Architecture</h2>
+          <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
+            {isClient && (
+              <SimpleMermaid
+                chart={`
 graph TD
     A["User Input"] --> B["Input Validation"]
     B --> C["Address Type Detection"]
@@ -89,44 +128,54 @@ graph TD
     R --> Q
     H --> Q
 `}
-        />
+              />
+            )}
+          </div>
+
+          <h2 className="text-2xl font-bold mt-8 mb-4">Technology Stack</h2>
+          <ul className="list-disc pl-6 mb-6 text-zinc-300">
+            <li>
+              <strong className="text-white">Frontend</strong>: Next.js, React, TailwindCSS
+            </li>
+            <li>
+              <strong className="text-white">Backend</strong>: Next.js API Routes, Serverless Functions
+            </li>
+            <li>
+              <strong className="text-white">Database</strong>: Supabase (PostgreSQL)
+            </li>
+            <li>
+              <strong className="text-white">AI Processing</strong>: OpenAI API
+            </li>
+            <li>
+              <strong className="text-white">Data Sources</strong>: Solscan, Birdeye, DexScreener
+            </li>
+            <li>
+              <strong className="text-white">Deployment</strong>: Vercel
+            </li>
+          </ul>
+
+          <h2 className="text-2xl font-bold mt-8 mb-4">Security Considerations</h2>
+          <ul className="list-disc pl-6 mb-6 text-zinc-300">
+            <li>All API keys are stored as environment variables</li>
+            <li>User data is encrypted at rest</li>
+            <li>Rate limiting is implemented for all external API calls</li>
+            <li>Input validation is performed on all user inputs</li>
+          </ul>
+
+          <h2 className="text-2xl font-bold mt-8 mb-4">Scalability</h2>
+          <p className="text-zinc-300">
+            The architecture is designed to scale horizontally, with stateless components that can be replicated as
+            needed. The use of serverless functions allows for automatic scaling based on demand.
+          </p>
+        </div>
+
+        {/* Navigation */}
+        <div className="mt-12 pt-8 border-t border-white/10">
+          <Link href="/docs" className="text-purple-400 hover:text-purple-300 flex items-center gap-2">
+            ← Back to Documentation
+          </Link>
+        </div>
       </div>
-
-      <h2 className="text-2xl font-bold mt-8 mb-4">Technology Stack</h2>
-      <ul className="list-disc pl-6 mb-6 text-zinc-300">
-        <li>
-          <strong className="text-white">Frontend</strong>: Next.js, React, TailwindCSS
-        </li>
-        <li>
-          <strong className="text-white">Backend</strong>: Next.js API Routes, Serverless Functions
-        </li>
-        <li>
-          <strong className="text-white">Database</strong>: Supabase (PostgreSQL)
-        </li>
-        <li>
-          <strong className="text-white">AI Processing</strong>: OpenAI API
-        </li>
-        <li>
-          <strong className="text-white">Data Sources</strong>: Solscan, Birdeye, DexScreener
-        </li>
-        <li>
-          <strong className="text-white">Deployment</strong>: Vercel
-        </li>
-      </ul>
-
-      <h2 className="text-2xl font-bold mt-8 mb-4">Security Considerations</h2>
-      <ul className="list-disc pl-6 mb-6 text-zinc-300">
-        <li>All API keys are stored as environment variables</li>
-        <li>User data is encrypted at rest</li>
-        <li>Rate limiting is implemented for all external API calls</li>
-        <li>Input validation is performed on all user inputs</li>
-      </ul>
-
-      <h2 className="text-2xl font-bold mt-8 mb-4">Scalability</h2>
-      <p className="text-zinc-300">
-        The architecture is designed to scale horizontally, with stateless components that can be replicated as needed.
-        The use of serverless functions allows for automatic scaling based on demand.
-      </p>
-    </DocPageTemplate>
+    </div>
   )
 }

@@ -1,17 +1,38 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
-import SimpleMermaid from "@/components/simple-mermaid"
+import { ChevronRight, Home } from "lucide-react"
+import dynamic from "next/dynamic"
+
+// Dynamically import the mermaid component with SSR disabled
+const SimpleMermaid = dynamic(() => import("@/components/simple-mermaid"), {
+  ssr: false,
+  loading: () => <div className="p-4 bg-zinc-800/50 rounded-lg">Loading diagram...</div>,
+})
 
 export default function UserInterfaceGuidePage() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
+          <Link href="/" className="hover:text-white">
+            <Home size={16} />
+          </Link>
+          <ChevronRight size={14} />
           <Link href="/docs" className="hover:text-white">
             Documentation
+          </Link>
+          <ChevronRight size={14} />
+          <Link href="/docs/getting-started" className="hover:text-white">
+            Getting Started
           </Link>
           <ChevronRight size={14} />
           <span className="text-white">User Interface Guide</span>
@@ -62,8 +83,9 @@ export default function UserInterfaceGuidePage() {
 
           <p>The LyxAI interface follows a consistent layout pattern across all sections:</p>
 
-          <SimpleMermaid
-            chart={`
+          {isClient && (
+            <SimpleMermaid
+              chart={`
           graph TD
             A["Header Navigation"] --> B["Main Content Area"]
             A --> C["Side Navigation"]
@@ -73,7 +95,8 @@ export default function UserInterfaceGuidePage() {
             C --> G["Quick Access Links"]
             C --> H["User Settings"]
           `}
-          />
+            />
+          )}
 
           <h2 className="text-2xl font-semibold mt-10 mb-4">Feature-Specific Interfaces</h2>
 
