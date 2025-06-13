@@ -4,7 +4,7 @@ The Whale Activity Tracker is LyxAI's flagship feature for monitoring large Sola
 
 ## Process Overview
 
-```mermaid
+\`\`\`mermaid
 graph TB
     A[Discord Channels] --> B[Webhook Receiver]
     B --> C[Message Parser]

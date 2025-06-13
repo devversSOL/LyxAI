@@ -13,7 +13,7 @@ LyxAI is built as a modern web application using Next.js, with a focus on real-t
 
 ## Component Architecture
 
-```mermaid
+\`\`\`mermaid
 graph LR
     subgraph "User Interface"
         A["Chat Interface"]
