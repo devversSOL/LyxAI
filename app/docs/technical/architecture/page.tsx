@@ -42,7 +42,7 @@ export default function ArchitecturePage() {
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
             <div className="flex justify-center">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-06-13%20at%2019.30.13-q3mzgpTU9HfUSyjIF7k4dqQUu76Ub1.png"
+                src="/images/component-architecture.png"
                 alt="LyxAI System Architecture Diagram showing User Interface components (Chat Interface, Whale Tracker, Contract Analyzer, Saved Wallets) connecting to State Management (React State, Real-time Updates, Performance Monitor) which connects to API Services (Analysis Service, Whale Service, Chat Service, Wallet Service)"
                 width={800}
                 height={600}
@@ -56,7 +56,7 @@ export default function ArchitecturePage() {
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
             <div className="flex justify-center">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-OGLmNnp2IPecuAO3ZbeCrz2K53tGaY.png"
+                src="/images/data-flow-architecture.png"
                 alt="LyxAI Data Flow Architecture Diagram showing the complete process flow from User Input through Input Validation, Address Type Detection, branching to Token or Wallet paths, with Token path going through Database Check, External API Calls (DexScreener, Birdeye, Solscan), Data Aggregation, AI Processing, Risk Assessment, Store in Database, and Return Results. Wallet path goes through Wallet Analysis and Wallet Data Processing to Return Results."
                 width={800}
                 height={1200}
