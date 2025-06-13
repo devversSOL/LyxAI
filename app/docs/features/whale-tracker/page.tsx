@@ -7,24 +7,24 @@ import mermaid from "mermaid" // Import the Mermaid library
 
 export default function WhaleTrackerDocs() {
   useEffect(() => {
-    // Basic initialization with startOnLoad: false so we can manually render
-    mermaid.initialize({
-      startOnLoad: false, // Important: we'll trigger rendering manually
-      theme: "dark",
-      themeVariables: {
-        primaryColor: "#a855f7",
-        primaryTextColor: "#ffffff",
-        primaryBorderColor: "#7c3aed",
-        lineColor: "#6366f1",
-      },
-      securityLevel: "loose",
-    })
+    // Increase timeout to ensure rendering happens after page is stable
+    const timer = setTimeout(() => {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "dark",
+        themeVariables: {
+          primaryColor: "#a855f7",
+          primaryTextColor: "#ffffff",
+          primaryBorderColor: "#7c3aed",
+          lineColor: "#6366f1",
+        },
+        securityLevel: "loose",
+      })
 
-    // Add a small delay to ensure DOM is ready
-    setTimeout(() => {
-      // This will process all elements with class "mermaid" in the document
       mermaid.init(undefined, document.querySelectorAll(".mermaid"))
-    }, 500)
+    }, 1000) // Longer timeout
+
+    return () => clearTimeout(timer)
   }, [])
 
   // Define Mermaid diagram content as strings to avoid JSX parsing issues
@@ -93,7 +93,7 @@ classDiagram
   `
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white no-3d-background">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
