@@ -2,11 +2,21 @@ import Link from "next/link"
 import { ChevronRight, Home, Search, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { getDocsByCategory } from "@/lib/docs"
+
+// Define our documentation structure manually since we're moving away from MD files
+const docsByCategory = {
+  "getting-started": [{ slug: "getting-started/user-interface", title: "User Interface Guide" }],
+  features: [
+    { slug: "features/whale-tracker", title: "Whale Tracker" },
+    { slug: "features/wallet-analyzer", title: "Wallet Analyzer" },
+    { slug: "features/coin-analyzer", title: "Coin Analyzer" },
+    { slug: "features/narrative-analysis", title: "Narrative Analysis" },
+  ],
+  technical: [{ slug: "technical/architecture", title: "System Architecture" }],
+  // Removed resources category entirely
+}
 
 export default function DocsPage() {
-  const docsByCategory = getDocsByCategory()
-
   return (
     <div className="flex min-h-screen bg-black text-white">
       {/* Sidebar */}

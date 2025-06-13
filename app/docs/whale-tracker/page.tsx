@@ -1,86 +1,12 @@
-"use client"
-
 import Link from "next/link"
 import { ChevronRight, Home } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-
-// Copy the exact working component from the test page
-function WorkingMermaid({ chart, title }: { chart: string; title?: string }) {
-  const mermaidRef = useRef<HTMLDivElement>(null)
-  const [status, setStatus] = useState("Loading...")
-
-  useEffect(() => {
-    const loadMermaid = async () => {
-      try {
-        setStatus("Importing Mermaid...")
-        const mermaid = (await import("mermaid")).default
-
-        setStatus("Initializing...")
-        mermaid.initialize({
-          startOnLoad: true,
-          theme: "dark",
-          themeVariables: {
-            primaryColor: "#a855f7",
-            primaryTextColor: "#ffffff",
-            primaryBorderColor: "#7c3aed",
-            lineColor: "#6366f1",
-            sectionBkgColor: "#1f2937",
-            altSectionBkgColor: "#374151",
-            gridColor: "#4b5563",
-            secondaryColor: "#ec4899",
-            tertiaryColor: "#10b981",
-          },
-        })
-
-        if (mermaidRef.current) {
-          setStatus("Rendering diagram...")
-          mermaidRef.current.innerHTML = `
-            <pre class="mermaid">
-              ${chart}
-            </pre>
-          `
-
-          await mermaid.contentLoaded()
-          setStatus("Complete!")
-        }
-      } catch (error) {
-        console.error("Mermaid error:", error)
-        setStatus(`Error: ${error}`)
-      }
-    }
-
-    loadMermaid()
-  }, [chart])
-
-  return (
-    <div className="my-6">
-      {title && <h3 className="text-lg font-semibold mb-3 text-white">{title}</h3>}
-      <div className="bg-gray-900/50 rounded-lg p-6 border border-white/10">
-        <div className="text-sm text-gray-400 mb-2">Status: {status}</div>
-        <div ref={mermaidRef} />
-      </div>
-    </div>
-  )
-}
+import {
+  WhaleTrackerDataFlow,
+  TokenFilteringProcess,
+  RealTimeUpdateMechanism,
+} from "@/components/diagrams/whale-tracker-diagrams"
 
 export default function WhaleTrackerDocs() {
-  const whaleTrackerFlow = `
-    graph TB
-      A[Discord Alert] --> B[Webhook Receiver]
-      B --> C[Message Parser]
-      C --> D{Valid Whale Alert?}
-      D -->|Yes| E[Extract Token Info]
-      D -->|No| F[Discard Message]
-      E --> G[Fetch Token Data]
-      G --> H[DexScreener API]
-      G --> I[Birdeye API]
-      H --> J[Data Aggregation]
-      I --> J
-      J --> K[Store in Database]
-      K --> L[Real-time UI Update]
-      L --> M[User Dashboard]
-  `
-
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -112,10 +38,15 @@ export default function WhaleTrackerDocs() {
             Real-time monitoring of large Solana transactions and whale movements with live Discord integration.
           </p>
 
-          <h2 className="text-2xl font-bold mb-4">Data Flow Process</h2>
-          <p className="text-zinc-300 mb-4">The complete flow from Discord whale alerts to user dashboard updates:</p>
+          <h2 className="text-2xl font-bold mb-4">Overview</h2>
+          <p className="text-zinc-300 mb-6">
+            The Whale Activity Tracker captures whale alerts from Discord channels instantly, processes the data, and
+            displays real-time whale activities with comprehensive filtering and analysis capabilities.
+          </p>
 
-          <WorkingMermaid chart={whaleTrackerFlow} title="Whale Tracker Data Flow" />
+          <h2 className="text-2xl font-bold mb-4">Process Flows</h2>
+
+          <WhaleTrackerDataFlow />
 
           <h3 className="text-xl font-semibold mb-4">Key Features</h3>
           <ul className="text-zinc-300 space-y-2 mb-6">
@@ -135,6 +66,38 @@ export default function WhaleTrackerDocs() {
               <strong>Performance Metrics:</strong> Win rates, biggest wins, market cap analysis
             </li>
           </ul>
+
+          <TokenFilteringProcess />
+
+          <h3 className="text-xl font-semibold mb-4">Real-time Architecture</h3>
+          <p className="text-zinc-300 mb-6">
+            The system uses Supabase real-time subscriptions to ensure users see whale activities as they happen,
+            providing instant notifications and updates across all connected clients.
+          </p>
+
+          <RealTimeUpdateMechanism />
+
+          <h3 className="text-xl font-semibold mb-4">Data Sources</h3>
+          <ul className="text-zinc-300 space-y-2 mb-6">
+            <li>
+              <strong>Discord Webhooks:</strong> Primary source for whale activity alerts
+            </li>
+            <li>
+              <strong>DexScreener API:</strong> Token metadata and trading information
+            </li>
+            <li>
+              <strong>Birdeye API:</strong> Market cap and price data
+            </li>
+            <li>
+              <strong>Solscan API:</strong> Blockchain transaction verification
+            </li>
+          </ul>
+
+          <h3 className="text-xl font-semibold mb-4">Performance Optimization</h3>
+          <p className="text-zinc-300 mb-6">
+            The whale tracker is optimized for real-time performance with efficient data processing, smart caching, and
+            minimal UI re-renders to ensure smooth user experience even with high-frequency whale activities.
+          </p>
         </article>
 
         {/* Navigation */}

@@ -1,186 +1,131 @@
 "use client"
 
-import { useEffect } from "react"
 import Link from "next/link"
-import { ChevronRight, Home } from "lucide-react"
-import mermaid from "mermaid" // Import the Mermaid library
+import { ChevronLeft } from "lucide-react"
+import SimpleMermaid from "@/components/simple-mermaid"
 
-export default function WhaleTrackerDocs() {
-  useEffect(() => {
-    // Increase timeout to ensure rendering happens after page is stable
-    const timer = setTimeout(() => {
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: "dark",
-        themeVariables: {
-          primaryColor: "#a855f7",
-          primaryTextColor: "#ffffff",
-          primaryBorderColor: "#7c3aed",
-          lineColor: "#6366f1",
-        },
-        securityLevel: "loose",
-      })
-
-      mermaid.init(undefined, document.querySelectorAll(".mermaid"))
-    }, 1000) // Longer timeout
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  // Define Mermaid diagram content as strings to avoid JSX parsing issues
-  const flowchartDiagram = `
-flowchart TD
-  A[Discord Bot] -->|Listens to| B[Solana Whale Transactions]
-  B -->|Filters by| C{Transaction Size}
-  C -->|${">"} 10,000 SOL| D[High Priority Alert]
-  C -->|${">"} 1,000 SOL| E[Medium Priority Alert]
-  C -->|${">"} 100 SOL| F[Low Priority Alert]
-  D --> G[Notification System]
-  E --> G
-  F --> G
-  G -->|Sends to| H[User Dashboard]
-  G -->|Sends to| I[Discord Channel]
-  `
-
-  const sequenceDiagram = `
-sequenceDiagram
-  participant Blockchain as Solana Blockchain
-  participant Service as Whale Tracking Service
-  participant DB as Database
-  participant UI as User Interface
-  
-  Blockchain->>Service: New Transaction Event
-  Service->>Service: Filter & Analyze Transaction
-  alt Is Whale Transaction
-    Service->>DB: Store Transaction Data
-    Service->>UI: Real-time Update
-    UI->>UI: Notify User
-  else Not Significant
-    Service->>Service: Discard Transaction
-  end
-  `
-
-  const classDiagram = `
-classDiagram
-  class WhaleTransaction {
-    +String transactionId
-    +String walletAddress
-    +String amount
-    +Timestamp time
-    +String tokenSymbol
-    +Number usdValue
-    +analyze()
-    +categorize()
-  }
-  
-  class WalletProfile {
-    +String address
-    +Number totalValue
-    +Number transactionCount
-    +Array transactions
-    +calculateRisk()
-    +getHistory()
-  }
-  
-  class AlertSystem {
-    +notify()
-    +filterAlerts()
-    +prioritize()
-  }
-  
-  WhaleTransaction --> WalletProfile
-  WhaleTransaction --> AlertSystem
-  `
-
+export default function WhaleTrackerPage() {
   return (
-    <div className="min-h-screen bg-black text-white no-3d-background">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
-          <Link href="/" className="hover:text-white">
-            <Home size={14} />
-          </Link>
-          <ChevronRight size={14} />
-          <Link href="/docs" className="hover:text-white">
-            Documentation
-          </Link>
-          <ChevronRight size={14} />
-          <Link href="/docs/features" className="hover:text-white">
-            Features
-          </Link>
-          <ChevronRight size={14} />
-          <span className="text-white">Whale Tracker</span>
-        </div>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
+        <Link href="/docs" className="hover:text-white flex items-center gap-1">
+          <ChevronLeft size={16} />
+          <span>Documentation</span>
+        </Link>
+      </div>
 
-        {/* Content */}
-        <div className="prose prose-invert max-w-none">
-          <h1 className="text-4xl font-bold mb-6">Whale Activity Tracker</h1>
+      {/* Content */}
+      <div className="prose prose-invert max-w-none">
+        <h1 className="text-4xl font-bold mb-6">🐋 Whale Activity Tracker</h1>
 
-          <p className="text-xl text-zinc-300 mb-8">
-            Real-time monitoring of large Solana transactions and whale movements
-          </p>
+        <p className="text-xl text-zinc-300 mb-8">
+          The Whale Activity Tracker is LyxAI's flagship feature for monitoring large Solana transactions and whale
+          movements in real-time.
+        </p>
 
-          <h2 className="text-2xl font-semibold mt-8 mb-4">How It Works</h2>
-          <p>
-            The system continuously monitors the Solana blockchain for transactions exceeding certain thresholds. When a
-            significant transaction is detected, it's analyzed, categorized, and displayed in real-time.
-          </p>
+        <h2 className="text-2xl font-bold mt-8 mb-4">Process Overview</h2>
+        <SimpleMermaid
+          chart={`
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#a855f7', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7c3aed', 'lineColor': '#6366f1', 'secondaryColor': '#ec4899', 'tertiaryColor': '#10b981' }}}%%
+graph TB
+    A["Discord Channels"] --> B["Webhook Receiver"]
+    B --> C["Message Parser"]
+    C --> D["Whale Detection"]
+    D --> E{"Valid Whale Alert?"}
+    
+    E -->|Yes| F["Extract Token Info"]
+    E -->|No| G["Discard Message"]
+    
+    F --> H["Fetch Token Data"]
+    H --> I["DexScreener API"]
+    H --> J["Birdeye API"]
+    
+    I --> K["Data Aggregation"]
+    J --> K
+    
+    K --> L["Store in Database"]
+    L --> M["Real-time UI Update"]
+    M --> N["User Dashboard"]
+    
+    O["User Filters"] --> P["Token Selection"]
+    P --> Q["Filter Results"]
+    Q --> N
+`}
+        />
 
-          {/* First diagram - using string variable */}
-          <div className="my-8 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
-            <h3 className="text-xl font-medium mb-4">Whale Transaction Flow</h3>
-            <div className="overflow-x-auto py-4">
-              <div className="mermaid">{flowchartDiagram}</div>
-            </div>
+        <h2 className="text-2xl font-bold mt-8 mb-4">Key Features</h2>
+        <ul className="list-disc pl-6 mb-6 text-zinc-300">
+          <li>Real-time monitoring of large transactions on Solana</li>
+          <li>Automatic token identification and data enrichment</li>
+          <li>Customizable alerts and notifications</li>
+          <li>Historical transaction data and analytics</li>
+          <li>Integration with token analysis for comprehensive insights</li>
+        </ul>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Data Sources</h2>
+        <p className="text-zinc-300 mb-6">
+          The Whale Activity Tracker aggregates data from multiple sources to provide comprehensive insights:
+        </p>
+        <ul className="list-disc pl-6 mb-6 text-zinc-300">
+          <li>Discord whale alert channels</li>
+          <li>DexScreener API for token pricing and liquidity data</li>
+          <li>Birdeye API for additional market metrics</li>
+          <li>Solana blockchain explorers for transaction verification</li>
+        </ul>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">User Interface</h2>
+        <p className="text-zinc-300">
+          The Whale Activity Tracker features a real-time dashboard with customizable filters, allowing users to focus
+          on specific tokens, transaction sizes, or time periods. The interface includes visual indicators for
+          transaction size and impact, as well as quick links to token analysis and historical data.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Implementation Details</h2>
+        <SimpleMermaid
+          chart={`
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#a855f7', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7c3aed', 'lineColor': '#6366f1', 'secondaryColor': '#ec4899', 'tertiaryColor': '#10b981' }}}%%
+sequenceDiagram
+    participant Discord as Discord Bot
+    participant Webhook as Webhook Receiver
+    participant Parser as Message Parser
+    participant API as External APIs
+    participant DB as Database
+    participant UI as User Interface
+    
+    Discord->>Webhook: Send Whale Alert
+    Webhook->>Parser: Process Message
+    Parser->>Parser: Extract Token Info
+    Parser->>API: Fetch Token Data
+    API-->>Parser: Return Token Data
+    Parser->>DB: Store Transaction
+    DB-->>UI: Update Dashboard
+    UI->>UI: Notify User
+`}
+        />
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Use Cases</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="bg-zinc-800/50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">Market Monitoring</h3>
+            <p className="text-zinc-300 text-sm">
+              Track large movements that might impact token prices and market sentiment.
+            </p>
           </div>
-
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Real-time Updates</h2>
-          <p>
-            The Whale Tracker provides real-time notifications for significant transactions, allowing users to react
-            quickly to market movements. The system categorizes transactions by size and potential market impact.
-          </p>
-
-          {/* Second diagram */}
-          <div className="my-8 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
-            <h3 className="text-xl font-medium mb-4">Real-time Update Sequence</h3>
-            <div className="overflow-x-auto py-4">
-              <div className="mermaid">{sequenceDiagram}</div>
-            </div>
+          <div className="bg-zinc-800/50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">Investment Research</h3>
+            <p className="text-zinc-300 text-sm">Identify patterns in whale behavior to inform investment decisions.</p>
           </div>
-
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Technical Implementation</h2>
-          <p>
-            The Whale Tracker is built using a combination of blockchain listeners, data processing services, and
-            real-time notification systems. It integrates with Discord for alerts and provides a comprehensive
-            dashboard.
-          </p>
-
-          {/* Third diagram */}
-          <div className="my-8 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
-            <h3 className="text-xl font-medium mb-4">System Architecture</h3>
-            <div className="overflow-x-auto py-4">
-              <div className="mermaid">{classDiagram}</div>
-            </div>
+          <div className="bg-zinc-800/50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">Risk Management</h3>
+            <p className="text-zinc-300 text-sm">
+              Get early warnings about potential market manipulation or large sell-offs.
+            </p>
           </div>
-
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Key Features</h2>
-          <ul>
-            <li>Real-time monitoring of large Solana transactions</li>
-            <li>Automatic categorization by transaction size and impact</li>
-            <li>Historical data analysis and pattern recognition</li>
-            <li>Discord integration for instant alerts</li>
-            <li>Customizable notification thresholds</li>
-            <li>Wallet profiling for known whale addresses</li>
-          </ul>
-
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Use Cases</h2>
-          <ul>
-            <li>Identifying potential market movements before they occur</li>
-            <li>Tracking institutional investor behavior</li>
-            <li>Monitoring project treasury movements</li>
-            <li>Analyzing whale accumulation and distribution patterns</li>
-            <li>Research on market manipulation tactics</li>
-          </ul>
+          <div className="bg-zinc-800/50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">Token Discovery</h3>
+            <p className="text-zinc-300 text-sm">Discover new tokens that are attracting significant whale interest.</p>
+          </div>
         </div>
       </div>
     </div>

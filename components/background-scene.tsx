@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { Environment, MeshTransmissionMaterial } from "@react-three/drei"
 import type * as THREE from "three"
-import { usePathname } from "next/navigation"
 
 // Performance detection hook
 function usePerformanceLevel() {
@@ -112,7 +111,9 @@ function OptimizedGlassCube({
   )
 }
 
-function Scene({ performanceLevel }: { performanceLevel: string }) {
+function Scene() {
+  const performanceLevel = usePerformanceLevel()
+
   // Reduce number of objects based on performance
   const objectCount = {
     low: 2,
@@ -152,32 +153,8 @@ function Scene({ performanceLevel }: { performanceLevel: string }) {
 }
 
 export default function BackgroundScene() {
-  const pathname = usePathname()
-  const isDocPage = pathname.includes("/docs")
-  const [performanceLevel, setPerformanceLevel] = useState<"high" | "medium" | "low">("medium")
+  const performanceLevel = usePerformanceLevel()
   const [showFallback, setShowFallback] = useState(false)
-
-  useEffect(() => {
-    if (isDocPage) {
-      setPerformanceLevel("low")
-    } else {
-      const detectPerformance = () => {
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-        const isLowEnd = navigator.hardwareConcurrency <= 4
-        const hasLimitedMemory = (navigator as any).deviceMemory && (navigator as any).deviceMemory <= 4
-
-        if (isMobile || isLowEnd || hasLimitedMemory) {
-          setPerformanceLevel("low")
-        } else if (navigator.hardwareConcurrency <= 8) {
-          setPerformanceLevel("medium")
-        } else {
-          setPerformanceLevel("high")
-        }
-      }
-
-      detectPerformance()
-    }
-  }, [isDocPage])
 
   // Show fallback for very low-end devices
   useEffect(() => {
@@ -211,7 +188,7 @@ export default function BackgroundScene() {
         performance={{ min: 0.5 }}
         dpr={performanceLevel === "low" ? 1 : performanceLevel === "medium" ? 1.5 : 2}
       >
-        <Scene performanceLevel={performanceLevel} />
+        <Scene />
         {performanceLevel !== "low" && <Environment preset="night" />}
       </Canvas>
 
