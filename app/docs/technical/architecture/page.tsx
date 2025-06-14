@@ -1,8 +1,23 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronRight, Home } from "lucide-react"
-import Image from "next/image"
+import dynamic from "next/dynamic"
+
+// Dynamically import the mermaid component with SSR disabled
+const SimpleMermaid = dynamic(() => import("@/components/simple-mermaid"), {
+  ssr: false,
+  loading: () => <div className="p-4 bg-zinc-800/50 rounded-lg">Loading diagram...</div>,
+})
 
 export default function ArchitecturePage() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -40,53 +55,82 @@ export default function ArchitecturePage() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Component Architecture</h2>
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-            <div className="flex justify-center">
-              <Image
-                src="/images/component-architecture.png"
-                alt="LyxAI System Architecture Diagram showing User Interface components (Chat Interface, Whale Tracker, Contract Analyzer, Saved Wallets) connecting to State Management (React State, Real-time Updates, Performance Monitor) which connects to API Services (Analysis Service, Whale Service, Chat Service, Wallet Service)"
-                width={800}
-                height={600}
-                className="rounded-lg"
-                priority
+            {isClient && (
+              <SimpleMermaid
+                chart={`
+graph LR
+    subgraph "User Interface"
+        A["Chat Interface"]
+        B["Whale Tracker"]
+        C["Contract Analyzer"]
+        D["Saved Wallets"]
+    end
+    
+    subgraph "State Management"
+        E["React State"]
+        F["Real-time Updates"]
+        G["Performance Monitor"]
+    end
+    
+    subgraph "API Services"
+        H["Analysis Service"]
+        I["Whale Service"]
+        J["Chat Service"]
+        K["Wallet Service"]
+    end
+    
+    A --> E
+    B --> E
+    C --> E
+    D --> E
+    E --> H
+    E --> I
+    E --> J
+    E --> K
+    F --> E
+    G --> E
+`}
               />
-            </div>
+            )}
           </div>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Data Flow Architecture</h2>
           <div className="bg-zinc-900/50 p-6 rounded-lg mb-8 border border-zinc-800">
-            <div className="flex justify-center">
-              <Image
-                src="/images/data-flow-architecture.png"
-                alt="LyxAI Data Flow Architecture Diagram showing the complete process flow from User Input through Input Validation, Address Type Detection, branching to Token or Wallet paths, with Token path going through Database Check, External API Calls (DexScreener, Birdeye, Solscan), Data Aggregation, AI Processing, Risk Assessment, Store in Database, and Return Results. Wallet path goes through Wallet Analysis and Wallet Data Processing to Return Results."
-                width={800}
-                height={1200}
-                className="rounded-lg"
-                priority
+            {isClient && (
+              <SimpleMermaid
+                chart={`
+graph TD
+    A["User Input"] --> B["Input Validation"]
+    B --> C["Address Type Detection"]
+    C --> D{"Token or Wallet?"}
+    
+    D -->|Token| E["Database Check"]
+    D -->|Wallet| F["Wallet Analysis"]
+    
+    E --> G{"Found in DB?"}
+    G -->|Yes| H["Return Cached Analysis"]
+    G -->|No| I["External API Calls"]
+    
+    I --> J["DexScreener API"]
+    I --> K["Birdeye API"]
+    I --> L["Solscan API"]
+    
+    J --> M["Data Aggregation"]
+    K --> M
+    L --> M
+    
+    M --> N["AI Processing"]
+    N --> O["Risk Assessment"]
+    O --> P["Store in Database"]
+    P --> Q["Return Results"]
+    
+    F --> R["Wallet Data Processing"]
+    R --> Q
+    H --> Q
+`}
               />
-            </div>
+            )}
           </div>
-
-          <p className="text-zinc-300 mb-6">The data flow follows these key processes:</p>
-
-          <h3 className="text-xl font-semibold mt-6 mb-3 text-purple-400">Token Analysis Flow</h3>
-          <ol className="list-decimal pl-6 mb-4 text-zinc-300">
-            <li>User input is validated and address type is detected</li>
-            <li>System checks if token data exists in database</li>
-            <li>If cached data exists, return immediately</li>
-            <li>If not cached, make external API calls to DexScreener, Birdeye, and Solscan</li>
-            <li>Aggregate data from all sources</li>
-            <li>Process through AI for analysis and risk assessment</li>
-            <li>Store results in database for future use</li>
-            <li>Return comprehensive analysis to user</li>
-          </ol>
-
-          <h3 className="text-xl font-semibold mt-6 mb-3 text-blue-400">Wallet Analysis Flow</h3>
-          <ol className="list-decimal pl-6 mb-6 text-zinc-300">
-            <li>User input is validated and identified as wallet address</li>
-            <li>Direct wallet analysis is performed</li>
-            <li>Wallet data is processed and analyzed</li>
-            <li>Results are returned to user</li>
-          </ol>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Technology Stack</h2>
           <ul className="list-disc pl-6 mb-6 text-zinc-300">
@@ -119,7 +163,7 @@ export default function ArchitecturePage() {
           </ul>
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Scalability</h2>
-          <p className="text-zinc-300 mb-6">
+          <p className="text-zinc-300">
             The architecture is designed to scale horizontally, with stateless components that can be replicated as
             needed. The use of serverless functions allows for automatic scaling based on demand.
           </p>
